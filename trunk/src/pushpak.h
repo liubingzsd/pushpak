@@ -31,8 +31,8 @@ extern "C"{
 //!
 //!	System Error codes bit position
 //!
-#define EXECUTION_TIME_OVERFLOW	1	//! \def Control loop took longer to execute than loop time period.
-#define RC_LINK_ERROR			2	//! \def RC Reciever inputs faulty or loss of signal.
+#define EXECUTION_TIME_OVERFLOW	0	//! \def Control loop took longer to execute than loop time period.
+#define RC_LINK_ERROR			1	//! \def RC Reciever inputs faulty or loss of signal.
 
 
 ///
@@ -72,6 +72,20 @@ extern "C"{
 
 #define LED	D, 4			//! \def LED is on Port D, pin 4.
 #define GYRO_AUTO_ZERO B, 1	//! \def Auto zero pin of IDG500 gyro. (X & Y axis)
+
+
+typedef uint8_t boolean;
+typedef uint8_t byte;
+
+//sbi and cbi has been deprecated, but is is used in the hardwareSeria.C file which has been taken from
+//Arduino frame work.
+
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
 
 #ifdef __cplusplus
 } // extern "C"

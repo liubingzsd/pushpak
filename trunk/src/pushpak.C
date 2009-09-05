@@ -27,11 +27,14 @@
 #include "servo_out.h"
 #include "adc.h"
 
+#include "Print.h"
+#include "HardwareSerial.h"
+
 //////////////////////////////////////////////////////////////////
 // Global variables
-uint8_t gSystemError = 0;
-uint8_t gSystemTimerTick = 0;
-uint16_t gSystemTime = 0;
+volatile uint8_t gSystemError = 0;
+volatile uint8_t gSystemTimerTick = 0;
+volatile uint16_t gSystemTime = 0;
 //////////////////////////////////////////////////////////////////
 
 
@@ -81,69 +84,84 @@ ISR(TIMER1_COMPA_vect){
 	gSystemTimerTick = 1;
 	++gSystemTime;
 
-	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
+//	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
 }
 
 
 
 void setup() 
 {
-  
 	//Initialize all the global variables 
 	gSystemError = 0;
 	gSystemTimerTick = 0;
 	gSystemTime = 0;
 
-//	Serial.begin(38400); 
-//	Serial.println("Servo pulse decoding......");
+	Serial.begin(115200); 
+	Serial.println("Pushpak Quadrotor........");
 	
 	GPIO_OUTPUT(LED);
-    
-	initialize_servo_in();
-	timer1_init();
 
-	servo_out_init();
-	GPIO_SET(LED);
+//	servo_out_init();
+//	initialize_servo_in();
+
+//	initialize_adc(); //Initialize adc at the last as this funtion enable interrupts.
+	timer1_init();
 	sei(); //enable interrupts
+//	cli(); //Disable interrupts before copying the current RC reciever pulse values
+
+
 }
+
+uint32_t testCounter;
 
 void loop() 
 {
+//	static	uint8_t width;
+	
 	//Wait for System Timer Tick
 	//Could also use the ADC flag to lock the sampling rate to control loop rate.
-	while(gSystemTimerTick == 0);
+	while(gSystemTimerTick == 0)
 	gSystemTimerTick = 0; //clear the flag
 	//GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
 	
 /********************************************************************************/
 	// User code to control the Quadrotor goes here in between these comment lines.
-	
+// /********************************************************************************/
+// 	// User code to control the Quadrotor goes here in between these comment lines.
+// 	//++width;
 
-	
-	// Use code should not 
-/********************************************************************************/	
+// 	update_adc_samples();
+// 	update_servo_in();
 
-	//Status and Error checking code
-		
-	
-	//Every 30-40ms check if new RC reciever pulse was decoded. If no new pulse was decoded then
-	//possible loss of RC radio link.
-	//Mask the last 2 bits and check if they are zero. Probably faster than modulo by 4 operation.
-	if((gSystemTime & 0x3) == 0)
-	{
-		//Check if bottom 4 bits corresponding to 4 channels of RC reciever are set
-		if((gServoInStatus & 0xF) != 0xF)
-		{//At least one of the receivers channels is malfunctioning
-			SET_BIT(gSystemError,RC_LINK_ERROR);	
-		}
-	}
-	
-	//This should be last line in the control loop code.
-	//Check if the current iteration of the code has take more time than control loop time period.	
-	if(gSystemTimerTick == 1)
-	{
-		SET_BIT(gSystemError,EXECUTION_TIME_OVERFLOW);	
-	}
+// 	servo_out_update(1,0);
+// 	servo_out_update(2,128);
+// 	servo_out_update(3,0);
+// 	servo_out_update(4,128);		
+
+// 	//End of User code section.
+// /********************************************************************************/	
+
+// 	//Status and Error checking code
+// 		
+// 	
+// 	//Every 30-40ms check if new RC reciever pulse was decoded. If no new pulse was decoded then
+// 	//possible loss of RC radio link.
+// 	//Mask the last 2 bits and check if they are zero. Probably faster than modulo by 4 operation.
+// 	if((gSystemTime & 0x3) == 0)
+// 	{
+// 		//Check if bottom 4 bits corresponding to 4 channels of RC reciever are set
+// 		if((gServoInStatus & 0xF) != 0xF)
+// 		{//At least one of the receivers channels is malfunctioning
+// 			SET_BIT(gSystemError,RC_LINK_ERROR);	
+// 		}
+// 	}
+// 	
+// 	//This should be last line in the control loop code.
+// 	//Check if the current iteration of the code has take more time than control loop time period.	
+// 	if(gSystemTimerTick == 1)
+// 	{
+// 		SET_BIT(gSystemError,EXECUTION_TIME_OVERFLOW);	
+// 	}
 }
 
 

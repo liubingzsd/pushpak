@@ -68,10 +68,16 @@ void initialize_adc( )
 	//Set the mux for first channel.
 	//LSB 4 bits determine the channel, reset them for first channel
 	ADMUX = (ADC_REF_EXT << 6) | (0x07 & 0);	
-		
+	
+	ADCSRA = 0;	
 	ADCSRA |= _BV(ADATE);	//Enable Auto Trigger
 	ADCSRA |= _BV(ADIE);	//Enable Interrupt
 	ADCSRA |= _BV(ADEN);	//Enable ADC.
+	//Clock prescale to 128.
+	ADCSRA |= _BV(ADPS2);	//Clock Prescale
+	ADCSRA |= _BV(ADPS1);	//Clock Prescale
+	ADCSRA |= _BV(ADPS0);	//Clock Prescale
+	
 	
 	//initialize all the variables
 	gADC_acc_cnt = 0;
@@ -92,12 +98,13 @@ void initialize_adc( )
 	//to change the channel. ADC clock has time period of 8uS so have to wait for that time.
 	//Following dummy loop is for the delay. By using gADC_ch for delay loop counter, ensuring that
 	//delay loop does not get optimized out.	
-	gADC_ch = 70;
-	while(gADC_ch != 1)
-	{
-		--gADC_ch;
-	}
+// 	gADC_ch = 70;
+// 	while(gADC_ch != 1)
+// 	{
+// 		--gADC_ch;
+// 	}
 	
+	gADC_ch = 1;
 	ADMUX = (ADMUX & 0xF8) | (0x07 & gADC_ch);
 }
 
@@ -123,6 +130,7 @@ void update_adc_samples(void)
 	// reenable interrupts.
 	SREG = oldSREG;
 }
+
 
 
 
