@@ -31,7 +31,7 @@ extern "C"{
 
 
 #define NUM_ADC_CH 				8	//! \def Number of ADC channels to sample
-#define MAX_ACCUMLATION_COUNT	15	//! \def Number of samples to accumlate and generate one output.
+#define MAX_ACCUMLATION_COUNT	16	//! \def Number of samples to accumlate and generate one output.
 
 #define ADC_REF_EXT 	0	//! \def ADC reference voltage is set to VREF pin(external).
 #define ADC_REF_AVCC	1	//! \def ADC reference voltage is set to analog supply voltage (AVCC).
