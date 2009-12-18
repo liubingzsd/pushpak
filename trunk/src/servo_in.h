@@ -25,16 +25,20 @@
 extern "C"{
 #endif
 
+
+#define MIN_SERVO_IN_COUNT	312	//Count value for minimum Servo pulse(1ms pulse)
+#define MAX_SERVO_IN_COUNT	625 //Count value for maximum Servo pulse(2ms pulse)
+
 //!
 //! Global variables that contains current RC Reciever input pulse width values. These variables
 //! are upated when update_servo_in() is called.
 //!
-extern uint16_t gCh1ServoIn, gCh2ServoIn, gCh3ServoIn, gCh4ServoIn ;
+extern uint8_t gCh1ServoIn, gCh2ServoIn, gCh3ServoIn, gCh4ServoIn ;
 extern volatile uint8_t gServoInStatus; //! If a new pulse is decoded on a channel the corresponding bit is set.
 
 
 void initialize_servo_in();
-void update_servo_in();
+uint8_t update_servo_in();
 
 
 #ifdef __cplusplus

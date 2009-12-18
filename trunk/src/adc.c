@@ -26,36 +26,41 @@
 
 #include "adc.h"
 
-/// This library provides access to Analog to Digital Converter(ADC) using auto trigger functionality. Libray internally samples
-/// at much higher rate. It then acumalates multiple samples to provide final 100Hz out sample rate.
+/// This library provides access to Analog to Digital Converter(ADC) using auto
+/// trigger functionality. Libray internally samples the signals at much higher rate.
+/// It then acumalates multiple samples to provide final 100Hz out sample rate.
+
+/// The ADC clock prescale is set to 128, which provides 156.250KHz ADC clock.
+/// ADC requires 13 clock cycles to sample data. So sampling rate is 156.250/13 = 12.0192KHz.
+/// This library samples all the 8 channels in continous loop using interrupts and
+/// autotrigger functionality. 
+/// Individual channel sample rate = 12.0192/8 = 1.5024KHz. After accumalating 16 samples 
+/// The final sample rate is 1.5024/16 = 93.9 Hz. 
+///
+/// We have 16x oversampling and accumlation which provides with addition bits as defined by
+/// samples to be accumlated = 2^(4n) where n is number of additional bits.
+///
+/// With accumlation of 16 samples data 4 bit data growth out of which only 2 bits are useful.
+///	So in the final output LSB 2 bits are dropped.
 
 
 //These global variables should be visible only in this file.
 static uint8_t gADC_ch;
 static uint8_t gADC_acc_cnt;						// Accumlation count
-//static uint8_t gADC_max_acc_cnt;					// Maximum number of samples to accumlate
 static volatile uint16_t gADC_acc[NUM_ADC_CH]; 		//Contains the intermediate accumlator values
 static volatile uint16_t gADC_sample[NUM_ADC_CH];	//Contains the final accumlated output result
-volatile uint16_t gADC_output[NUM_ADC_CH];
 
+
+volatile uint16_t gADC_output[NUM_ADC_CH];
 volatile uint8_t gADC_new_output = 0;	//Flag to indicate when accumlation is finished and new output is available. This flag can used
 										//to synchronise the control loop to excat same rate as ADC sampling rate. The ADC sampling rate is
-										//100.16Hz.
+										//93.9 Hz.
 //***************************************************
 //Temporary variables for testing and characterization of the board. Delete for normal operation
 volatile uint16_t gADC_curr[NUM_ADC_CH];		//current ADC sample without any accumlation or averaging
 volatile uint16_t gADC_curr_output[NUM_ADC_CH];	//current ADC sample without any accumlation or averaging
 
 //***************************************************
-
-/// The ADC clock prescale is set to 128, which provides 156.250KHz ADC clock.
-/// ADC requires 13 clock cycles to sample data. So sampling rate is 156.250/13 = 12.0192KHz.
-/// This library samples all the 8 channels in continous loop using interrupts and autotrigger functionality. 
-/// Individual channel sample rate = 12.0192/8 = 1.5024KHz. With a 100Hz loop rate each individual channel will be sampled 15 times 
-/// in one loop iteration. Hence we have 15 times oversampling. The 15 samples are accumlated and presented as the finaly output.
-
-/// The library does not divide the result by 15 and get average value. Using the accumlated value we get advantage of 2 bits of
-/// increased ADC resolution. So now we have a 12bit ADC. 
 
 void initialize_adc( )
 {

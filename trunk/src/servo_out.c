@@ -36,7 +36,7 @@
 //!								Hardware PWM pins
 //!
 
-void servo_out_init(void)
+void initialize_servo_out(void)
 {
 	
 	//Set Timer 0 in Fast PWM mode, clock prescale of 256.
@@ -94,7 +94,7 @@ void servo_out_init(void)
 //!						val of 255 servro output is maximum(2ms long pulse)
 //!
 
-void servo_out_update(uint8_t ch, uint8_t val)
+void update_servo_out(uint8_t ch, uint8_t val)
 {
 	uint8_t count;
 

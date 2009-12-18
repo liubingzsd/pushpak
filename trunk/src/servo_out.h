@@ -34,8 +34,8 @@ extern "C"{
 #define MAX_SERVO_OUT_COUNT	156 //Count to generate maximum Servo pulse(2ms pulse)
 
 
-void servo_out_init();
-void servo_out_update(uint8_t ch, uint8_t val);
+void initialize_servo_out();
+void update_servo_out(uint8_t ch, uint8_t val);
 
 #ifdef __cplusplus
 } // extern "C"

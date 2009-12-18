@@ -8,6 +8,8 @@ MCU = atmega644p
 TARGET = pushpak.elf
 CC = avr-gcc
 
+CPP = avr-g++
+
 ## Options common to compile, link and assembly rules
 COMMON = -mmcu=$(MCU)
 
@@ -35,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = pushpak.o Print.o HardwareSerial.o cpp_hack.o adc.o 
+OBJECTS = Print.o HardwareSerial.o cpp_hack.o adc.o adc_test.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -44,9 +46,6 @@ LINKONLYOBJECTS =
 all: $(TARGET) pushpak.hex pushpak.eep pushpak.lss size
 
 ## Compile
-pushpak.o: ../pushpak.C
-	$(CC) $(INCLUDES) $(CFLAGS) -c -fno-exceptions $<
-
 Print.o: ../Print.C
 	$(CC) $(INCLUDES) $(CFLAGS) -c -fno-exceptions $<
 
@@ -57,6 +56,9 @@ cpp_hack.o: ../cpp_hack.C
 	$(CC) $(INCLUDES) $(CFLAGS) -c -fno-exceptions $<
 
 adc.o: ../adc.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+adc_test.o: ../adc_test.C
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link
