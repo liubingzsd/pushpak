@@ -83,6 +83,9 @@ LOAD HardwareSerial.o
 LOAD cpp_hack.o
 LOAD adc.o
 LOAD adc_test.o
+LOAD messages.o
+LOAD accelerometer.o
+LOAD gyrosensor.o
 LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
 LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5\libc.a
 LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
@@ -177,7 +180,7 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x1cf6
+.text           0x00000000     0x2358
  *(.vectors)
  .vectors       0x00000000       0x7c c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
                 0x00000000                __vectors
@@ -198,279 +201,321 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
                 0x0000007c                __ctors_start = .
  *(.ctors)
  .ctors         0x0000007c        0x2 HardwareSerial.o
-                0x0000007e                __ctors_end = .
-                0x0000007e                __dtors_start = .
+ .ctors         0x0000007e        0x2 accelerometer.o
+ .ctors         0x00000080        0x2 gyrosensor.o
+                0x00000082                __ctors_end = .
+                0x00000082                __dtors_start = .
  *(.dtors)
-                0x0000007e                __dtors_end = .
+                0x00000082                __dtors_end = .
  SORT(*)(.ctors)
  SORT(*)(.dtors)
  *(.init0)
- .init0         0x0000007e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
-                0x0000007e                __init
+ .init0         0x00000082        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
+                0x00000082                __init
  *(.init0)
  *(.init1)
  *(.init1)
  *(.init2)
- .init2         0x0000007e        0xc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
+ .init2         0x00000082        0xc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
  *(.init2)
  *(.init3)
  *(.init3)
  *(.init4)
- .init4         0x0000008a       0x16 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
-                0x0000008a                __do_copy_data
- .init4         0x000000a0       0x10 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
-                0x000000a0                __do_clear_bss
+ .init4         0x0000008e       0x16 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
+                0x0000008e                __do_copy_data
+ .init4         0x000000a4       0x10 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
+                0x000000a4                __do_clear_bss
  *(.init4)
  *(.init5)
  *(.init5)
  *(.init6)
- .init6         0x000000b0       0x16 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
-                0x000000b0                __do_global_ctors
+ .init6         0x000000b4       0x16 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
+                0x000000b4                __do_global_ctors
  *(.init6)
  *(.init7)
  *(.init7)
  *(.init8)
  *(.init8)
  *(.init9)
- .init9         0x000000c6        0x8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
+ .init9         0x000000ca        0x8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
  *(.init9)
  *(.text)
- .text          0x000000ce        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
-                0x000000ce                __vector_22
-                0x000000ce                __vector_28
-                0x000000ce                __vector_1
-                0x000000ce                __vector_12
-                0x000000ce                __bad_interrupt
-                0x000000ce                __vector_6
-                0x000000ce                __vector_3
-                0x000000ce                __vector_23
-                0x000000ce                __vector_30
-                0x000000ce                __vector_25
-                0x000000ce                __vector_11
-                0x000000ce                __vector_13
-                0x000000ce                __vector_17
-                0x000000ce                __vector_19
-                0x000000ce                __vector_7
-                0x000000ce                __vector_27
-                0x000000ce                __vector_5
-                0x000000ce                __vector_4
-                0x000000ce                __vector_9
-                0x000000ce                __vector_2
-                0x000000ce                __vector_21
-                0x000000ce                __vector_15
-                0x000000ce                __vector_29
-                0x000000ce                __vector_8
-                0x000000ce                __vector_26
-                0x000000ce                __vector_14
-                0x000000ce                __vector_10
-                0x000000ce                __vector_16
-                0x000000ce                __vector_18
-                0x000000ce                __vector_20
- .text          0x000000d2        0x0 Print.o
- .text          0x000000d2        0x0 HardwareSerial.o
- .text          0x000000d2        0x0 cpp_hack.o
- .text          0x000000d2        0x0 adc.o
- .text          0x000000d2        0x0 adc_test.o
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
- .text          0x000000d2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
- .text          0x000000d2       0x58 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
-                0x000000d2                __fixunssfsi
- .text          0x0000012a      0x354 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
-                0x000003c2                __subsf3
-                0x00000424                __addsf3
- .text          0x0000047e      0x1f4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
-                0x0000047e                __mulsf3
- .text          0x00000672      0x158 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
-                0x00000672                __divsf3
- .text          0x000007ca       0x60 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
-                0x000007ca                __gesf2
- .text          0x0000082a       0x60 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
-                0x0000082a                __ltsf2
- .text          0x0000088a       0xbc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
-                0x0000088a                __floatsisf
- .text          0x00000946       0xa8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
-                0x00000946                __fixsfsi
- .text          0x000009ee        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
- .text          0x000009ee       0xf2 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
-                0x000009ee                __floatunsisf
- .text          0x00000ae0        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
- .text          0x00000ae0        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
- .text          0x00000ae0        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
- .text          0x00000ae0        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
- .text          0x00000ae0       0x9e c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
-                0x00000ae0                __clzsi2
- .text          0x00000b7e      0x1aa c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
-                0x00000b7e                __pack_f
- .text          0x00000d28       0xf0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
-                0x00000d28                __unpack_f
- .text          0x00000e18       0xb2 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
-                0x00000e18                __fpcmp_parts_f
- .text          0x00000eca        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
-                0x00000eca                . = ALIGN (0x2)
+ .text          0x000000d2        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
+                0x000000d2                __vector_22
+                0x000000d2                __vector_28
+                0x000000d2                __vector_1
+                0x000000d2                __vector_12
+                0x000000d2                __bad_interrupt
+                0x000000d2                __vector_6
+                0x000000d2                __vector_3
+                0x000000d2                __vector_23
+                0x000000d2                __vector_30
+                0x000000d2                __vector_25
+                0x000000d2                __vector_11
+                0x000000d2                __vector_13
+                0x000000d2                __vector_17
+                0x000000d2                __vector_19
+                0x000000d2                __vector_7
+                0x000000d2                __vector_27
+                0x000000d2                __vector_5
+                0x000000d2                __vector_4
+                0x000000d2                __vector_9
+                0x000000d2                __vector_2
+                0x000000d2                __vector_21
+                0x000000d2                __vector_15
+                0x000000d2                __vector_29
+                0x000000d2                __vector_8
+                0x000000d2                __vector_26
+                0x000000d2                __vector_14
+                0x000000d2                __vector_10
+                0x000000d2                __vector_16
+                0x000000d2                __vector_18
+                0x000000d2                __vector_20
+ .text          0x000000d6        0x0 Print.o
+ .text          0x000000d6        0x0 HardwareSerial.o
+ .text          0x000000d6        0x0 cpp_hack.o
+ .text          0x000000d6        0x0 adc.o
+ .text          0x000000d6        0x0 adc_test.o
+ .text          0x000000d6        0x0 messages.o
+ .text          0x000000d6        0x0 accelerometer.o
+ .text          0x000000d6        0x0 gyrosensor.o
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
+ .text          0x000000d6        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
+ .text          0x000000d6       0x58 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
+                0x000000d6                __fixunssfsi
+ .text          0x0000012e      0x354 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
+                0x000003c6                __subsf3
+                0x00000428                __addsf3
+ .text          0x00000482      0x1f4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
+                0x00000482                __mulsf3
+ .text          0x00000676      0x158 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
+                0x00000676                __divsf3
+ .text          0x000007ce       0x60 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
+                0x000007ce                __gesf2
+ .text          0x0000082e       0x60 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
+                0x0000082e                __ltsf2
+ .text          0x0000088e       0xbc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
+                0x0000088e                __floatsisf
+ .text          0x0000094a       0xa8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
+                0x0000094a                __fixsfsi
+ .text          0x000009f2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
+ .text          0x000009f2       0xf2 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
+                0x000009f2                __floatunsisf
+ .text          0x00000ae4        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
+ .text          0x00000ae4        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
+ .text          0x00000ae4        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
+ .text          0x00000ae4        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
+ .text          0x00000ae4       0x9e c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
+                0x00000ae4                __clzsi2
+ .text          0x00000b82      0x1aa c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
+                0x00000b82                __pack_f
+ .text          0x00000d2c       0xf0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
+                0x00000d2c                __unpack_f
+ .text          0x00000e1c       0xb2 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
+                0x00000e1c                __fpcmp_parts_f
+ .text          0x00000ece        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
+                0x00000ece                . = ALIGN (0x2)
  *(.text.*)
  .text._ZN5Print5writeEPKc
-                0x00000eca       0x30 Print.o
-                0x00000eca                Print::write(char const*)
+                0x00000ece       0x30 Print.o
+                0x00000ece                Print::write(char const*)
  .text._ZN5Print5writeEPKhj
-                0x00000efa       0x3e Print.o
-                0x00000efa                Print::write(unsigned char const*, unsigned int)
+                0x00000efe       0x3e Print.o
+                0x00000efe                Print::write(unsigned char const*, unsigned int)
  .text._ZN5Print5printEh
-                0x00000f38       0x10 Print.o
-                0x00000f38                Print::print(unsigned char)
+                0x00000f3c       0x10 Print.o
+                0x00000f3c                Print::print(unsigned char)
  .text._ZN5Print5printEc
-                0x00000f48       0x10 Print.o
-                0x00000f48                Print::print(char)
+                0x00000f4c       0x10 Print.o
+                0x00000f4c                Print::print(char)
  .text._ZN5Print5printEPKc
-                0x00000f58       0x10 Print.o
-                0x00000f58                Print::print(char const*)
+                0x00000f5c       0x10 Print.o
+                0x00000f5c                Print::print(char const*)
  .text._ZN5Print7printlnEv
-                0x00000f68       0x2e Print.o
-                0x00000f68                Print::println()
+                0x00000f6c       0x2e Print.o
+                0x00000f6c                Print::println()
  .text._ZN5Print7printlnEc
-                0x00000f96       0x20 Print.o
-                0x00000f96                Print::println(char)
+                0x00000f9a       0x20 Print.o
+                0x00000f9a                Print::println(char)
  .text._ZN5Print7printlnEPKc
-                0x00000fb6       0x16 Print.o
-                0x00000fb6                Print::println(char const*)
+                0x00000fba       0x16 Print.o
+                0x00000fba                Print::println(char const*)
  .text._ZN5Print7printlnEh
-                0x00000fcc       0x20 Print.o
-                0x00000fcc                Print::println(unsigned char)
+                0x00000fd0       0x20 Print.o
+                0x00000fd0                Print::println(unsigned char)
  .text._ZN5Print11printNumberEmh
-                0x00000fec      0x130 Print.o
-                0x00000fec                Print::printNumber(unsigned long, unsigned char)
+                0x00000ff0      0x130 Print.o
+                0x00000ff0                Print::printNumber(unsigned long, unsigned char)
  .text._ZN5Print5printEm
-                0x0000111c        0x8 Print.o
-                0x0000111c                Print::print(unsigned long)
+                0x00001120        0x8 Print.o
+                0x00001120                Print::print(unsigned long)
  .text._ZN5Print7printlnEm
-                0x00001124       0x16 Print.o
-                0x00001124                Print::println(unsigned long)
+                0x00001128       0x16 Print.o
+                0x00001128                Print::println(unsigned long)
  .text._ZN5Print5printEj
-                0x0000113a        0xc Print.o
-                0x0000113a                Print::print(unsigned int)
+                0x0000113e        0xc Print.o
+                0x0000113e                Print::print(unsigned int)
  .text._ZN5Print7printlnEj
-                0x00001146       0x1c Print.o
-                0x00001146                Print::println(unsigned int)
+                0x0000114a       0x1c Print.o
+                0x0000114a                Print::println(unsigned int)
  .text._ZN5Print5printEl
-                0x00001162       0x4e Print.o
-                0x00001162                Print::print(long)
+                0x00001166       0x4e Print.o
+                0x00001166                Print::print(long)
  .text._ZN5Print7printlnEl
-                0x000011b0       0x16 Print.o
-                0x000011b0                Print::println(long)
+                0x000011b4       0x16 Print.o
+                0x000011b4                Print::println(long)
  .text._ZN5Print5printEi
-                0x000011c6       0x10 Print.o
-                0x000011c6                Print::print(int)
+                0x000011ca       0x10 Print.o
+                0x000011ca                Print::print(int)
  .text._ZN5Print7printlnEi
-                0x000011d6       0x20 Print.o
-                0x000011d6                Print::println(int)
+                0x000011da       0x20 Print.o
+                0x000011da                Print::println(int)
  .text._ZN5Print5printEli
-                0x000011f6       0x2a Print.o
-                0x000011f6                Print::print(long, int)
+                0x000011fa       0x2a Print.o
+                0x000011fa                Print::print(long, int)
  .text._ZN5Print7printlnEli
-                0x00001220       0x16 Print.o
-                0x00001220                Print::println(long, int)
+                0x00001224       0x16 Print.o
+                0x00001224                Print::println(long, int)
  .text._ZN5Print10printFloatEdh
-                0x00001236      0x10e Print.o
-                0x00001236                Print::printFloat(double, unsigned char)
+                0x0000123a      0x10e Print.o
+                0x0000123a                Print::printFloat(double, unsigned char)
  .text._ZN5Print5printEd
-                0x00001344        0x8 Print.o
-                0x00001344                Print::print(double)
+                0x00001348        0x8 Print.o
+                0x00001348                Print::print(double)
  .text._ZN5Print7printlnEd
-                0x0000134c       0x16 Print.o
-                0x0000134c                Print::println(double)
+                0x00001350       0x16 Print.o
+                0x00001350                Print::println(double)
  .text._ZN14HardwareSerialC2EP11ring_bufferPVhS3_S3_S3_S3_hhhhh
-                0x00001362       0x60 HardwareSerial.o
-                0x00001362                HardwareSerial::HardwareSerial(ring_buffer*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
+                0x00001366       0x60 HardwareSerial.o
+                0x00001366                HardwareSerial::HardwareSerial(ring_buffer*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
  .text._ZN14HardwareSerialC1EP11ring_bufferPVhS3_S3_S3_S3_hhhhh
-                0x000013c2       0x60 HardwareSerial.o
-                0x000013c2                HardwareSerial::HardwareSerial(ring_buffer*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
+                0x000013c6       0x60 HardwareSerial.o
+                0x000013c6                HardwareSerial::HardwareSerial(ring_buffer*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char volatile*, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
  .text._ZN14HardwareSerial5beginEl
-                0x00001422      0x1fc HardwareSerial.o
-                0x00001422                HardwareSerial::begin(long)
+                0x00001426      0x1fc HardwareSerial.o
+                0x00001426                HardwareSerial::begin(long)
  .text._ZN14HardwareSerial9availableEv
-                0x0000161e       0x28 HardwareSerial.o
-                0x0000161e                HardwareSerial::available()
+                0x00001622       0x28 HardwareSerial.o
+                0x00001622                HardwareSerial::available()
  .text._ZN14HardwareSerial4readEv
-                0x00001646       0x50 HardwareSerial.o
-                0x00001646                HardwareSerial::read()
+                0x0000164a       0x50 HardwareSerial.o
+                0x0000164a                HardwareSerial::read()
  .text._ZN14HardwareSerial5flushEv
-                0x00001696       0x18 HardwareSerial.o
-                0x00001696                HardwareSerial::flush()
+                0x0000169a       0x18 HardwareSerial.o
+                0x0000169a                HardwareSerial::flush()
  .text._ZN14HardwareSerial5writeEh
-                0x000016ae       0x26 HardwareSerial.o
-                0x000016ae                HardwareSerial::write(unsigned char)
+                0x000016b2       0x26 HardwareSerial.o
+                0x000016b2                HardwareSerial::write(unsigned char)
  .text._GLOBAL__I_rx_buffer
-                0x000016d4       0x74 HardwareSerial.o
+                0x000016d8       0x74 HardwareSerial.o
  .text.__cxa_guard_acquire
-                0x00001748       0x14 cpp_hack.o
-                0x00001748                __cxa_guard_acquire
+                0x0000174c       0x14 cpp_hack.o
+                0x0000174c                __cxa_guard_acquire
  .text.__cxa_guard_release
-                0x0000175c        0x8 cpp_hack.o
-                0x0000175c                __cxa_guard_release
+                0x00001760        0x8 cpp_hack.o
+                0x00001760                __cxa_guard_release
  .text.__cxa_guard_abort
-                0x00001764        0x2 cpp_hack.o
-                0x00001764                __cxa_guard_abort
+                0x00001768        0x2 cpp_hack.o
+                0x00001768                __cxa_guard_abort
  .text.__cxa_pure_virtual
-                0x00001766        0x2 cpp_hack.o
-                0x00001766                __cxa_pure_virtual
+                0x0000176a        0x2 cpp_hack.o
+                0x0000176a                __cxa_pure_virtual
  .text.adc_set_ref
-                0x00001768       0x16 adc.o
-                0x00001768                adc_set_ref
+                0x0000176c       0x16 adc.o
+                0x0000176c                adc_set_ref
  .text.adc_set_ch
-                0x0000177e       0x10 adc.o
-                0x0000177e                adc_set_ch
+                0x00001782       0x10 adc.o
+                0x00001782                adc_set_ch
  .text.adc_get_sample_cnt
-                0x0000178e       0x1c adc.o
-                0x0000178e                adc_get_sample_cnt
+                0x00001792       0x1c adc.o
+                0x00001792                adc_get_sample_cnt
  .text.adc_initialize
-                0x000017aa      0x14a adc.o
-                0x000017aa                adc_initialize
+                0x000017ae      0x16c adc.o
+                0x000017ae                adc_initialize
  .text.adc_is_data_ready
-                0x000018f4        0x6 adc.o
-                0x000018f4                adc_is_data_ready
+                0x0000191a        0x6 adc.o
+                0x0000191a                adc_is_data_ready
  .text.adc_get_new_samples
-                0x000018fa       0x60 adc.o
-                0x000018fa                adc_get_new_samples
+                0x00001920       0x60 adc.o
+                0x00001920                adc_get_new_samples
  .text.__vector_24
-                0x0000195a      0x140 adc.o
-                0x0000195a                __vector_24
+                0x00001980      0x140 adc.o
+                0x00001980                __vector_24
  .text._Z4loopv
-                0x00001a9a       0xa2 adc_test.o
-                0x00001a9a                loop()
+                0x00001ac0      0x118 adc_test.o
+                0x00001ac0                loop()
+ .text._Z16sensor_calibratev
+                0x00001bd8      0x1aa adc_test.o
+                0x00001bd8                sensor_calibrate()
  .text._Z5setupv
-                0x00001b3c       0x62 adc_test.o
-                0x00001b3c                setup()
- .text.main     0x00001b9e        0xa adc_test.o
-                0x00001b9e                main
- .text.libgcc   0x00001ba8       0x3e c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
-                0x00001ba8                __mulsi3
- .text.libgcc   0x00001be6       0x26 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
-                0x00001be6                __divmodhi4
-                0x00001be6                _div
- .text.libgcc   0x00001c0c       0x44 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
-                0x00001c0c                __udivmodsi4
- .text.libgcc   0x00001c50        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
- .text.libgcc   0x00001c50        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
- .text.libgcc   0x00001c50        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
- .text.libgcc   0x00001c50        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
- .text.libgcc   0x00001c50       0x28 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
-                0x00001c50                __udivmodhi4
- .text.libgcc   0x00001c78       0x38 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
-                0x00001c78                __prologue_saves__
- .text.libgcc   0x00001cb0       0x36 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
-                0x00001cb0                __epilogue_restores__
- .text.libgcc   0x00001ce6        0xc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
-                0x00001cea                __tablejump__
-                0x00001ce6                __tablejump2__
-                0x00001cf2                . = ALIGN (0x2)
+                0x00001d82      0x1aa adc_test.o
+                0x00001d82                setup()
+ .text.main     0x00001f2c        0xa adc_test.o
+                0x00001f2c                main
+ .text._Z22send_msg_sensor_valuesv
+                0x00001f36       0xb0 messages.o
+                0x00001f36                send_msg_sensor_values()
+ .text._Z23send_msg_ADC12b_samplesv
+                0x00001fe6       0xc8 messages.o
+                0x00001fe6                send_msg_ADC12b_samples()
+ .text._ZN13AccelerometerC2Ev
+                0x000020ae       0x20 accelerometer.o
+                0x000020ae                Accelerometer::Accelerometer()
+ .text._ZN13AccelerometerC1Ev
+                0x000020ce       0x20 accelerometer.o
+                0x000020ce                Accelerometer::Accelerometer()
+ .text._ZN13Accelerometer15set_zero_valuesEjjj
+                0x000020ee       0x10 accelerometer.o
+                0x000020ee                Accelerometer::set_zero_values(unsigned int, unsigned int, unsigned int)
+ .text._ZN13Accelerometer18process_ADC_sampleEjjj
+                0x000020fe       0x28 accelerometer.o
+                0x000020fe                Accelerometer::process_ADC_sample(unsigned int, unsigned int, unsigned int)
+ .text._GLOBAL__I__ZN13AccelerometerC2Ev
+                0x00002126       0x36 accelerometer.o
+ .text._ZN10GyroSensorC2Ev
+                0x0000215c       0x20 gyrosensor.o
+                0x0000215c                GyroSensor::GyroSensor()
+ .text._ZN10GyroSensorC1Ev
+                0x0000217c       0x20 gyrosensor.o
+                0x0000217c                GyroSensor::GyroSensor()
+ .text._ZN10GyroSensor15set_zero_valuesEjjj
+                0x0000219c       0x10 gyrosensor.o
+                0x0000219c                GyroSensor::set_zero_values(unsigned int, unsigned int, unsigned int)
+ .text._ZN10GyroSensor18process_ADC_sampleEjjj
+                0x000021ac       0x28 gyrosensor.o
+                0x000021ac                GyroSensor::process_ADC_sample(unsigned int, unsigned int, unsigned int)
+ .text._GLOBAL__I__ZN10GyroSensorC2Ev
+                0x000021d4       0x36 gyrosensor.o
+ .text.libgcc   0x0000220a       0x3e c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
+                0x0000220a                __mulsi3
+ .text.libgcc   0x00002248       0x26 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
+                0x00002248                __divmodhi4
+                0x00002248                _div
+ .text.libgcc   0x0000226e       0x44 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
+                0x0000226e                __udivmodsi4
+ .text.libgcc   0x000022b2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc   0x000022b2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc   0x000022b2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc   0x000022b2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
+ .text.libgcc   0x000022b2       0x28 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
+                0x000022b2                __udivmodhi4
+ .text.libgcc   0x000022da       0x38 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
+                0x000022da                __prologue_saves__
+ .text.libgcc   0x00002312       0x36 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
+                0x00002312                __epilogue_restores__
+ .text.libgcc   0x00002348        0xc c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
+                0x0000234c                __tablejump__
+                0x00002348                __tablejump2__
+                0x00002354                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00001cf2        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
-                0x00001cf2                exit
-                0x00001cf2                _exit
+ .fini9         0x00002354        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+                0x00002354                exit
+                0x00002354                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -489,11 +534,11 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00001cf2        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+ .fini0         0x00002354        0x4 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00001cf6                _etext = .
+                0x00002358                _etext = .
 
-.data           0x00800100      0x194 load address 0x00001cf6
+.data           0x00800100      0x222 load address 0x00002358
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800100        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
@@ -501,122 +546,132 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
  .data          0x00800102        0x0 HardwareSerial.o
  .data          0x00800102        0x0 cpp_hack.o
  .data          0x00800102        0x0 adc.o
- .data          0x00800102       0x62 adc_test.o
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
- .data          0x00800164        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
- .data          0x00800164        0x8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
-                0x00800164                __thenan_sf
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
- .data          0x0080016c        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
- .data          0x0080016c      0x100 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
-                0x0080016c                __clz_tab
+ .data          0x00800102      0x104 adc_test.o
+ .data          0x00800206        0x0 messages.o
+ .data          0x00800206        0x0 accelerometer.o
+ .data          0x00800206        0x0 gyrosensor.o
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
+ .data          0x00800206        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
+ .data          0x00800206        0x8 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
+                0x00800206                __thenan_sf
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
+ .data          0x0080020e        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
+ .data          0x0080020e      0x100 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
+                0x0080020e                __clz_tab
  *(.data*)
- .data.msg      0x0080026c       0x14 adc_test.o
-                0x0080026c                msg
  *(.rodata)
  *(.rodata*)
  .rodata._ZTV5Print
-                0x00800280        0xa Print.o
-                0x00800280                vtable for Print
+                0x0080030e        0xa Print.o
+                0x0080030e                vtable for Print
  .rodata._ZTV14HardwareSerial
-                0x0080028a        0xa HardwareSerial.o
-                0x0080028a                vtable for HardwareSerial
+                0x00800318        0xa HardwareSerial.o
+                0x00800318                vtable for HardwareSerial
  *(.gnu.linkonce.d*)
-                0x00800294                . = ALIGN (0x2)
-                0x00800294                _edata = .
-                0x00800294                PROVIDE (__data_end, .)
+                0x00800322                . = ALIGN (0x2)
+                0x00800322                _edata = .
+                0x00800322                PROVIDE (__data_end, .)
 
-.bss            0x00800294       0xf6
-                0x00800294                PROVIDE (__bss_start, .)
+.bss            0x00800322      0x122
+                0x00800322                PROVIDE (__bss_start, .)
  *(.bss)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
- .bss           0x00800294        0x0 Print.o
- .bss           0x00800294        0x0 HardwareSerial.o
- .bss           0x00800294        0x0 cpp_hack.o
- .bss           0x00800294        0x0 adc.o
- .bss           0x00800294        0x0 adc_test.o
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
- .bss           0x00800294        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/../../../../avr/lib/avr5/crtm644p.o
+ .bss           0x00800322        0x0 Print.o
+ .bss           0x00800322        0x0 HardwareSerial.o
+ .bss           0x00800322        0x0 cpp_hack.o
+ .bss           0x00800322        0x0 adc.o
+ .bss           0x00800322        0x0 adc_test.o
+ .bss           0x00800322        0x0 messages.o
+ .bss           0x00800322        0x0 accelerometer.o
+ .bss           0x00800322        0x0 gyrosensor.o
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mulsi3.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_divmodhi4.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodsi4.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_exit.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_copy_data.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clear_bss.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ctors.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fixunssfsi.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_addsub_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_mul_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_div_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_ge_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_lt_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_si_to_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_sf_to_si.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_thenan_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_usi_to_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_udivmodhi4.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_prologue.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_epilogue.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_tablejump.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clzsi2.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_pack_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_unpack_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_fpcmp_parts_sf.o)
+ .bss           0x00800322        0x0 c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a(_clz.o)
  *(.bss*)
  .bss.rx_buffer
-                0x00800294       0x84 HardwareSerial.o
-                0x00800294                rx_buffer
- .bss.Serial    0x00800318       0x13 HardwareSerial.o
-                0x00800318                Serial
+                0x00800322       0x84 HardwareSerial.o
+                0x00800322                rx_buffer
+ .bss.Serial    0x008003a6       0x13 HardwareSerial.o
+                0x008003a6                Serial
  .bss.gADC_new_output
-                0x0080032b        0x1 adc.o
-                0x0080032b                gADC_new_output
+                0x008003b9        0x1 adc.o
+                0x008003b9                gADC_new_output
  .bss.gADC_acc_cnt.1375
-                0x0080032c        0x1 adc.o
- .bss.gADC_ch   0x0080032d        0x1 adc.o
- .bss.gADC_acc  0x0080032e       0x10 adc.o
+                0x008003ba        0x1 adc.o
+ .bss.gADC_ch   0x008003bb        0x1 adc.o
+ .bss.gADC_acc  0x008003bc       0x10 adc.o
  .bss.gADC_sample
-                0x0080033e       0x10 adc.o
+                0x008003cc       0x10 adc.o
  .bss.gSystemTime
-                0x0080034e        0x4 adc_test.o
-                0x0080034e                gSystemTime
+                0x008003dc        0x4 adc_test.o
+                0x008003dc                gSystemTime
+ .bss.pkt       0x008003e0       0x14 adc_test.o
+                0x008003e0                pkt
+ .bss.Acclmtr   0x008003f4        0xc accelerometer.o
+                0x008003f4                Acclmtr
+ .bss.Gyro      0x00800400        0xc gyrosensor.o
+                0x00800400                Gyro
  *(COMMON)
- COMMON         0x00800352       0x38 adc.o
-                0x00800352                gADC_output
-                0x00800362                adc_ref_val
-                0x00800364                gADC_curr
-                0x00800374                gADC_curr_output
-                0x00800384                adc_raw_ref_val
-                0x00800386                gSample_cnt
-                0x0080038a                PROVIDE (__bss_end, .)
-                0x00001cf6                __data_load_start = LOADADDR (.data)
-                0x00001e8a                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x0080040c       0x38 adc.o
+                0x0080040c                gADC_output
+                0x0080041c                adc_ref_val
+                0x0080041e                gADC_curr
+                0x0080042e                gADC_curr_output
+                0x0080043e                adc_raw_ref_val
+                0x00800440                gSample_cnt
+                0x00800444                PROVIDE (__bss_end, .)
+                0x00002358                __data_load_start = LOADADDR (.data)
+                0x0000257a                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x0080038a        0x0
-                0x0080038a                PROVIDE (__noinit_start, .)
+.noinit         0x00800444        0x0
+                0x00800444                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x0080038a                PROVIDE (__noinit_end, .)
-                0x0080038a                _end = .
-                0x0080038a                PROVIDE (__heap_start, .)
+                0x00800444                PROVIDE (__noinit_end, .)
+                0x00800444                _end = .
+                0x00800444                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -667,7 +722,7 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x1e0
+.debug_aranges  0x00000000      0x290
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0xd0 Print.o
@@ -678,10 +733,16 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
  .debug_aranges
                 0x00000160       0x50 adc.o
  .debug_aranges
-                0x000001b0       0x30 adc_test.o
+                0x000001b0       0x38 adc_test.o
+ .debug_aranges
+                0x000001e8       0x28 messages.o
+ .debug_aranges
+                0x00000210       0x40 accelerometer.o
+ .debug_aranges
+                0x00000250       0x40 gyrosensor.o
 
 .debug_pubnames
-                0x00000000      0x477
+                0x00000000      0x612
  *(.debug_pubnames)
  .debug_pubnames
                 0x00000000      0x1b8 Print.o
@@ -692,42 +753,60 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
  .debug_pubnames
                 0x0000031d      0x114 adc.o
  .debug_pubnames
-                0x00000431       0x46 adc_test.o
+                0x00000431       0x5b adc_test.o
+ .debug_pubnames
+                0x0000048c       0x49 messages.o
+ .debug_pubnames
+                0x000004d5       0xa9 accelerometer.o
+ .debug_pubnames
+                0x0000057e       0x94 gyrosensor.o
 
-.debug_info     0x00000000     0x1956
+.debug_info     0x00000000     0x2498
  *(.debug_info)
  .debug_info    0x00000000      0xb2a Print.o
  .debug_info    0x00000b2a      0x6e9 HardwareSerial.o
  .debug_info    0x00001213       0xdc cpp_hack.o
- .debug_info    0x000012ef      0x468 adc.o
- .debug_info    0x00001757      0x1ff adc_test.o
+ .debug_info    0x000012ef      0x46b adc.o
+ .debug_info    0x0000175a      0x59d adc_test.o
+ .debug_info    0x00001cf7      0x237 messages.o
+ .debug_info    0x00001f2e      0x2b5 accelerometer.o
+ .debug_info    0x000021e3      0x2b5 gyrosensor.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev   0x00000000      0x7f4
+.debug_abbrev   0x00000000      0xce5
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x1ff Print.o
  .debug_abbrev  0x000001ff      0x286 HardwareSerial.o
  .debug_abbrev  0x00000485       0x99 cpp_hack.o
- .debug_abbrev  0x0000051e      0x1c0 adc.o
- .debug_abbrev  0x000006de      0x116 adc_test.o
+ .debug_abbrev  0x0000051e      0x1cf adc.o
+ .debug_abbrev  0x000006ed      0x22b adc_test.o
+ .debug_abbrev  0x00000918       0xc9 messages.o
+ .debug_abbrev  0x000009e1      0x182 accelerometer.o
+ .debug_abbrev  0x00000b63      0x182 gyrosensor.o
 
-.debug_line     0x00000000      0xf16
+.debug_line     0x00000000     0x16c0
  *(.debug_line)
  .debug_line    0x00000000      0x544 Print.o
  .debug_line    0x00000544      0x383 HardwareSerial.o
  .debug_line    0x000008c7       0xc8 cpp_hack.o
- .debug_line    0x0000098f      0x3d9 adc.o
- .debug_line    0x00000d68      0x1ae adc_test.o
+ .debug_line    0x0000098f      0x3e1 adc.o
+ .debug_line    0x00000d70      0x3fc adc_test.o
+ .debug_line    0x0000116c      0x18c messages.o
+ .debug_line    0x000012f8      0x1e7 accelerometer.o
+ .debug_line    0x000014df      0x1e1 gyrosensor.o
 
-.debug_frame    0x00000000      0x320
+.debug_frame    0x00000000      0x420
  *(.debug_frame)
  .debug_frame   0x00000000      0x180 Print.o
  .debug_frame   0x00000180       0x90 HardwareSerial.o
  .debug_frame   0x00000210       0x50 cpp_hack.o
  .debug_frame   0x00000260       0x80 adc.o
- .debug_frame   0x000002e0       0x40 adc_test.o
+ .debug_frame   0x000002e0       0x50 adc_test.o
+ .debug_frame   0x00000330       0x30 messages.o
+ .debug_frame   0x00000360       0x60 accelerometer.o
+ .debug_frame   0x000003c0       0x60 gyrosensor.o
 
-.debug_str      0x00000000      0x6e6
+.debug_str      0x00000000      0x99e
  *(.debug_str)
  .debug_str     0x00000000      0x2f7 Print.o
                                 0x33d (size before relaxing)
@@ -737,25 +816,36 @@ LOAD c:/winavr-20090313/bin/../lib/gcc/avr/4.3.2/avr5\libgcc.a
                                  0xc4 (size before relaxing)
  .debug_str     0x0000050a      0x157 adc.o
                                 0x205 (size before relaxing)
- .debug_str     0x00000661       0x85 adc_test.o
-                                0x18e (size before relaxing)
+ .debug_str     0x00000661      0x231 adc_test.o
+                                0x374 (size before relaxing)
+ .debug_str     0x00000892       0xa8 messages.o
+                                0x1cd (size before relaxing)
+ .debug_str     0x0000093a       0x35 accelerometer.o
+                                0x1d7 (size before relaxing)
+ .debug_str     0x0000096f       0x2f gyrosensor.o
+                                0x1c5 (size before relaxing)
 
-.debug_loc      0x00000000      0xd1d
+.debug_loc      0x00000000      0xeb4
  *(.debug_loc)
  .debug_loc     0x00000000      0x87d Print.o
  .debug_loc     0x0000087d      0x2a9 HardwareSerial.o
  .debug_loc     0x00000b26       0x50 cpp_hack.o
- .debug_loc     0x00000b76      0x194 adc.o
- .debug_loc     0x00000d0a       0x13 adc_test.o
+ .debug_loc     0x00000b76      0x17b adc.o
+ .debug_loc     0x00000cf1       0xd3 adc_test.o
+ .debug_loc     0x00000dc4       0x78 accelerometer.o
+ .debug_loc     0x00000e3c       0x78 gyrosensor.o
 
 .debug_macinfo
  *(.debug_macinfo)
 OUTPUT(pushpak.elf elf32-avr)
 LOAD linker stubs
 
-.debug_ranges   0x00000000      0x1b8
+.debug_ranges   0x00000000      0x250
  .debug_ranges  0x00000000       0xc8 Print.o
  .debug_ranges  0x000000c8       0x50 HardwareSerial.o
  .debug_ranges  0x00000118       0x30 cpp_hack.o
  .debug_ranges  0x00000148       0x48 adc.o
- .debug_ranges  0x00000190       0x28 adc_test.o
+ .debug_ranges  0x00000190       0x30 adc_test.o
+ .debug_ranges  0x000001c0       0x20 messages.o
+ .debug_ranges  0x000001e0       0x38 accelerometer.o
+ .debug_ranges  0x00000218       0x38 gyrosensor.o

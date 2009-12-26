@@ -63,9 +63,9 @@ def get_next_msg():
             
     #note this will lockup, if no timeout defined
     x = chr(0xAB) + chr(0xCD) + ser.read(msg_size - 2)
-    print("printing the complete stream")
-    for i in x :
-        print(ord(i))
+#    print("printing the complete stream")
+#    for i in x :
+#        print(ord(i))
     
     if len(x) == msg_size :
         y = struct.unpack(data_format,x)
@@ -82,15 +82,15 @@ print ("Using com port : COM4")
 #####################################
 #open serial port
 
-ser = serial.Serial(3,115200) #to open COM4, use value 3.
+ser = serial.Serial(2,115200) #to open COM4, use value 3.
 result = ser.isOpen()
 ser.setTimeout(1)
 print "Serial port opened:", result
 print "Size of message in bytes = ", msg_size
-       
-get_next_msg()
-get_next_msg()
-get_next_msg()
+
+
+while(True):      
+    get_next_msg()
         
 ser.close()
 print "closing"

@@ -20,6 +20,8 @@
 #ifndef _PUSHPAK_H
 #define _PUSHPAK_H
 
+#include <inttypes.h>
+
 //Needed to make it compatible with C++ compilers and Arduino environment.
 #ifdef __cplusplus
 extern "C"{

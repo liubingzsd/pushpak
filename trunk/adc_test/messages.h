@@ -10,28 +10,27 @@
 
 // Copyright (c) 2009 Brijesh Sirpatil
 
-#ifndef ADC_h
-#define ADC_h
+#ifndef messages_h
+#define messages_h
 
 #include <inttypes.h>
 
+
+void send_msg_ADC12b_samples(void);
+void send_msg_sensor_values(void);
+
+
+//message.C is compiled as C++ file so extern "C" is not required.
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-#define NUM_ADC_CH 				8	//! \def Number of ADC channels to sample
 
-extern volatile uint16_t gADC_output[NUM_ADC_CH];	//! \def Copy of the final accumlated output result which is accessed by user programs.
-extern volatile uint16_t gADC_curr[NUM_ADC_CH];		//! \def current ADC sample without any accumlation or averaging
-extern volatile uint16_t adc_ref_val, adc_raw_ref_val;		//! \def ADC sample value when 1.1V reference voltage is sampled.
 
-void adc_initialize();
-uint8_t adc_is_data_ready();
-void adc_get_new_samples(void);
-uint32_t adc_get_sample_cnt();
+
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif
+#endif	//messages_h
