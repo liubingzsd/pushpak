@@ -20,40 +20,135 @@
 
 #include "Print.h"
 #include "HardwareSerial.h"
+#include "messages.h"
+#include "Accelerometer.h"
+#include "GyroSensor.h"
+
 
 volatile uint32_t gSystemTime = 0;
 
-struct msg_type1{
-	uint16_t	header;
-	uint8_t		id; 		
+
+//Message structure from Robosavvy.com CHR-6d Digital Inertial Measurement Unit
+struct chr6d_msg{
+	uint8_t		hdr1; 		
+	uint8_t		hdr2; 		
+	uint8_t		hdr3; 		
+
+	uint8_t		pkt_type; 		
 	uint8_t		length;
-	uint32_t 	sys_time;
-	int16_t	acc_x;
-	int16_t	acc_y;
-	int16_t	acc_z;
-	int16_t	gyro_x;
-	int16_t	gyro_y;
+	uint8_t		active;
 	int16_t	gyro_z;
+	int16_t	gyro_y;
+	int16_t	gyro_x;
+	int16_t	acc_z;
+	int16_t	acc_y;
+	int16_t	acc_x;
+	uint16_t chk_sum;
 };
 
-struct msg_type1 msg = {0xABCD, 1}; 
+struct chr6d_msg pkt;
+///////////////////////////////////////////////////////////////////////////////
+
+
+void sensor_calibrate()
+{
+	uint8_t	i;
+	const uint8_t AVG_CNT = 100;
+
+	uint32_t gyro_x_zero, gyro_y_zero, gyro_z_zero;
+	uint32_t acc_x_zeroG, acc_y_zeroG, acc_z_zeroG;
+	
+		
+	GPIO_SET(GYRO_AUTO_ZERO); //send auto zero pulse
+	_delay_us(100);
+	GPIO_CLEAR(GYRO_AUTO_ZERO); 
+	
+	_delay_ms(100); //Gyro needs 10ms to finish auto zero, but we have low pass filter so wait longer
+
+	acc_x_zeroG = 0;
+ 	acc_y_zeroG = 0;
+ 	acc_z_zeroG = 0;
+ 	gyro_x_zero = 0;
+ 	gyro_y_zero = 0;
+ 	gyro_z_zero = 0;
+	
+	for(i=0;i<AVG_CNT;++i) //collect data for 1sec or 100 times
+	{
+		adc_get_new_samples();
+ 		acc_x_zeroG += gADC_output[0];
+	 	acc_y_zeroG += gADC_output[1];
+	 	acc_z_zeroG += gADC_output[2];
+	 	gyro_x_zero += gADC_output[3];
+	 	gyro_y_zero += gADC_output[4];
+	 	gyro_z_zero += gADC_output[5];		
+	
+	}	
+	
+	acc_x_zeroG /= AVG_CNT;
+ 	acc_y_zeroG /= AVG_CNT;
+ 	acc_z_zeroG /= AVG_CNT;
+ 	gyro_x_zero /= AVG_CNT;
+ 	gyro_y_zero /= AVG_CNT;
+ 	gyro_z_zero /= AVG_CNT;
+	
+ 	//Note for Z axis using the same value as X axis. When sensor board is flat, the Z is either +/- 1G.
+	Acclmtr.set_zero_values((uint16_t)acc_x_zeroG, (uint16_t)acc_y_zeroG, (uint16_t) acc_x_zeroG);	 	 	
+ 			
+	Gyro.set_zero_values((uint16_t)gyro_x_zero, (uint16_t)gyro_y_zero, (uint16_t) gyro_z_zero);	 	 	
+}
+
 
 void setup() 
 {
 
 	Serial.begin(115200); 
+	Serial.println();
+	Serial.println();
+	Serial.println();
 	Serial.println("Pushpak Quadrotor........");
 	
 	GPIO_OUTPUT(LED);
+	GPIO_OUTPUT(GYRO_AUTO_ZERO);
 
 	adc_initialize(); //Initialize adc at the last as this funtion enable interrupts.
 	
+	sensor_calibrate();
+	
 	Serial.print("Raw ADC count for 1.1V ref = ");
 	Serial.println(adc_raw_ref_val);
-	Serial.print("15x accumalated ADC count for 1.1V ref = ");
+	Serial.print("Raw ADC millivolts per count = ");
+	Serial.println((float) (1100.0/(float)adc_raw_ref_val));
+	
+	Serial.print("Accumalated 12bit ADC count for 1.1V ref = ");
 	Serial.println(adc_ref_val);
+	Serial.print("Accumalated 12bit ADC millivolts per count = ");
+	Serial.println((float) (1100.0/(float)adc_ref_val));
+		
+	Serial.print("Accelerometer calibration values, X, Y, Z: " );
+	Serial.print(Acclmtr.mX_zero);
+	Serial.print(", ");
+	Serial.print(Acclmtr.mY_zero);
+	Serial.print(", ");
+	Serial.print(Acclmtr.mZ_zero);
+	Serial.println();
+	
+	Serial.print("Gyro calibration values, X, Y, Z: " );
+	Serial.print(Gyro.mX_zero);
+	Serial.print(", ");
+	Serial.print(Gyro.mY_zero);
+	Serial.print(", ");
+	Serial.print(Gyro.mZ_zero);
+	Serial.println();
+
 	
 	Serial.println();
+	
+	pkt.hdr1 = 's';
+	pkt.hdr2 = 'n';
+	pkt.hdr3 = 'p';
+	pkt.pkt_type = 0xB7;
+	pkt.length = 13;
+	pkt.active = 0x3F;
 	
 	//Interrupts are enabled in the 
 	//sei(); //enable interrupts
@@ -63,39 +158,100 @@ void setup()
 void loop() 
 {
 	uint8_t	i;
-	
+	uint16_t chk_sum = 0;
+	uint8_t *ptr;
 	
 //	//use this for loop to reduce the data rate at which data is sent to pc.
-	for(i=0;i<50;++i)
-	{
-		adc_get_new_samples();
-	}
+ 	for(i=0;i<50;++i)
+ 	{
+ 		adc_get_new_samples();
+ 		Acclmtr.process_ADC_sample(gADC_output[0], gADC_output[1], gADC_output[2]);
+ 		Gyro.process_ADC_sample(gADC_output[3], gADC_output[4], gADC_output[5]);
+ 	}
+ 
+ 	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
 
-	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
-	
+ 		
 ///////////////////////////////////////////////////////////////	
-	//Send data in ASCII format.
-// 	for(i=0;i<NUM_ADC_CH;++i)
-// 	{
-// 		Serial.print((unsigned int) gADC_output[i]);
-// 		Serial.print(',');
-// 	}
-// 	Serial.println();
+// 	//Send ADC data in ASCII format.
+//  	Serial.print(adc_get_sample_cnt());
+//  	Serial.print(',');
+//  	for(i=0;i<NUM_ADC_CH;++i)
+//  	{
+//  		Serial.print((unsigned int) gADC_output[i]);
+//  		Serial.print(',');
+//  	}
+//  	Serial.println();
+
 ///////////////////////////////////////////////////////////////	
+
+///////////////////////////////////////////////////////////////	
+// 	//Send Sensor data in ASCII format.
+ 	Serial.print(adc_get_sample_cnt());
+ 	Serial.print(',');
+ 	
+	Serial.print(Acclmtr.mX);
+	Serial.print(',');
+	Serial.print(Acclmtr.mY);
+	Serial.print(',');
+	Serial.print(Acclmtr.mZ);
+	Serial.print(',');
+
+	Serial.print(Gyro.mX);
+	Serial.print(',');
+	Serial.print(Gyro.mY);
+	Serial.print(',');
+	Serial.print(Gyro.mZ);
+	Serial.print(',');
+		
+ 	Serial.println();
+
+///////////////////////////////////////////////////////////////	
+
+
+
+
+
+
+
+
+//	send_msg_sensor_values();
+
 	
-	//Send data in binary format.
-	msg.length = sizeof(msg_type1) - 4;
-	msg.sys_time = adc_get_sample_cnt();
-	msg.acc_x = gADC_output[0];
-	msg.acc_y = gADC_output[1];
-	msg.acc_z = gADC_output[2];
-	msg.gyro_x = gADC_output[3];
-	msg.gyro_y = gADC_output[4];
-	msg.gyro_z = gADC_output[5];
-	
-	Serial.write((uint8_t*)&msg, sizeof(msg_type1));
-//End of User code section.
-/********************************************************************************/	
+// 	//Send data in binary format.
+// 	msg.length = sizeof(msg_type1) - 4;
+// 	msg.sys_time = adc_get_sample_cnt();
+// 	msg.acc_x = gADC_output[0];
+// 	msg.acc_y = gADC_output[1];
+// 	msg.acc_z = gADC_output[2];
+// 	msg.gyro_x = gADC_output[3];
+// 	msg.gyro_y = gADC_output[4];
+// 	msg.gyro_z = gADC_output[5];
+// 
+// 	Serial.write((uint8_t*)&msg, sizeof(msg_type1));
+
+
+
+///////////////////////////////////////////////////////////
+// 	//Send message to robosavvy chr-6d GUI
+//  	pkt.acc_x = gADC_output[0];
+//  	pkt.acc_y = gADC_output[1];
+//  	pkt.acc_z = gADC_output[2];
+//  	pkt.gyro_x = gADC_output[3];
+//  	pkt.gyro_y = gADC_output[4];
+//  	pkt.gyro_z = gADC_output[5];
+//  	
+//  	
+//  	ptr = (uint8_t*)&pkt;
+//  	for(i=0;i< (sizeof(chr6d_msg) - 2);++i)
+//  	{
+//  		chk_sum += ptr[i];	
+//  	}
+//  	
+//  	pkt.chk_sum = chk_sum;
+//  	
+//  	Serial.write((uint8_t*)&pkt, sizeof(chr6d_msg));
+/////////////////////////////////////////////////////////////
 }
 
 

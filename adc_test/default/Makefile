@@ -37,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = Print.o HardwareSerial.o cpp_hack.o adc.o adc_test.o 
+OBJECTS = Print.o HardwareSerial.o cpp_hack.o adc.o adc_test.o messages.o accelerometer.o gyrosensor.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -59,6 +59,15 @@ adc.o: ../adc.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 adc_test.o: ../adc_test.C
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+messages.o: ../messages.C
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+accelerometer.o: ../accelerometer.C
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+gyrosensor.o: ../gyrosensor.C
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

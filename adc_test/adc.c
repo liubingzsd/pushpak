@@ -49,7 +49,7 @@
 
 
 volatile uint16_t gADC_output[NUM_ADC_CH];			//gADC_sample is copied into this variable when update_adc_samples() is called.
-uint16_t adc_ref_val, adc_raw_ref_val;
+volatile uint16_t adc_ref_val, adc_raw_ref_val;
 
 volatile uint32_t gSample_cnt;
 
@@ -144,7 +144,6 @@ void adc_initialize( )
 	
 	//Accumlation increase bit count, but actual increase in ADC bit resolution is lesser.
 	//Drop the addition bits
-	adc_raw_ref_val = adc_raw_ref_val >> LSB_DROP_CNT;
 	adc_ref_val = adc_ref_val >> LSB_DROP_CNT; 
 	
 /**********************************************************************************************/
