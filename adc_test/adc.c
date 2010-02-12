@@ -48,10 +48,13 @@
 #define ADC_INP_GND		0x1F	//! \def ADC input is Ground.
 
 
-volatile uint16_t gADC_output[NUM_ADC_CH];			//gADC_sample is copied into this variable when update_adc_samples() is called.
-volatile uint16_t adc_ref_val, adc_raw_ref_val;
-
+volatile uint16_t gADC_output[NUM_ADC_CH];			//Contains latest accumalted and updated sample
 volatile uint32_t gSample_cnt;
+
+uint16_t adc_ref_val, adc_raw_ref_val;
+uint16_t adc_conv_factor;
+#define FACTOR_MULTIPLE 10			//number of bits the ADC conversion factor is left shifted.
+
 
 
 //These global variables should be visible only in this file.
@@ -85,7 +88,7 @@ void adc_set_ch(uint8_t ch)
 /// Gives the number of times ADC has cycled through and produced sample since reset.
 /// This count is equivalent to system time count if the system loop is locked with the ADC samples.
 ///
-uint32_t adc_get_sample_cnt()
+uint32_t adc_get_sample_time()
 {
 	uint8_t oldSREG;
 	uint32_t temp;
@@ -105,6 +108,8 @@ void adc_initialize( )
 {
 	uint8_t i;
 	uint8_t high, low;
+	
+	float factor;
 	 
 	gSample_cnt = 0;
 	//Clock prescale to 128.
@@ -122,7 +127,7 @@ void adc_initialize( )
 	//Get use internal 1.1V to calibrate the ADC refrence voltage
 	adc_set_ch(ADC_INP_11REF);
 
-	_delay_ms(100); //delay needed to let the voltages stablize and accurate reading of 1.1V refrence.
+	_delay_ms(100); //delay needed to let the voltages stablize and get accurate reading of 1.1V refrence.
 
 	adc_ref_val = 0;
 	adc_raw_ref_val = 0;	
@@ -145,6 +150,14 @@ void adc_initialize( )
 	//Accumlation increase bit count, but actual increase in ADC bit resolution is lesser.
 	//Drop the addition bits
 	adc_ref_val = adc_ref_val >> LSB_DROP_CNT; 
+	
+	//Calculate milli Volts per count.
+	//To get better resolution multiply the conversion by 1024 or 10bits.
+	//Perform floating point operations and then convert to integer value
+	
+	factor = (1100.0* (1 << FACTOR_MULTIPLE))/adc_ref_val; 	//The refrence voltage inside AVR is 1.1V which 1100 in mV
+	factor = factor + 0.5; 					//To round the value to nearest integer
+	adc_conv_factor = (uint16_t) factor;
 	
 /**********************************************************************************************/
 //Initialize for Autotrigger functionality.
@@ -198,7 +211,7 @@ uint8_t adc_is_data_ready()
 /// Function blocks till a new sample is available. It copies the accumlated output to an array.
 /// This copy is necessary since the ADC samples are continously being accumlated by the interrupts. 
 /// ADC ouput after accumalation is 12bits.
-void adc_get_new_samples(void)
+void adc_update(void)
 {
 	uint8_t i;
 	uint8_t oldSREG;
@@ -217,6 +230,27 @@ void adc_get_new_samples(void)
 	
 	// reenable interrupts.
 	SREG = oldSREG;
+}
+
+
+/// Returns ADC sample in millivolts.
+int16_t adc_get_value_mv( uint8_t ch)
+{
+	int32_t temp1, temp2	;
+	//adc_conv_factor is 2^FACTOR_MULTIPLE larger than actual value. Did that for precision
+	//So multiply by conversion factor and then perform division by left shift to get true value in mV.
+
+	temp1 = gADC_output[ch];
+	temp2 = (temp1 * 743);
+	temp2 = temp2 >> FACTOR_MULTIPLE;
+
+	return (int16_t) temp2;
+}
+
+/// Returns ADC sample.
+int16_t adc_get_sample( uint8_t ch)
+{
+	return gADC_output[ch];
 }
 
 

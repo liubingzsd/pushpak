@@ -15,30 +15,60 @@
 Accelerometer::Accelerometer()
 {
 	//Store precomputed Sensor reading. This values must be updated during sensor calibrartion.
-	mX_zero = 1234;
-	mY_zero = 1234;
-	mZ_zero = 1234;
+	m_zerog_x = 1234;
+	m_zerog_y = 1234;
+	m_zerog_z = 1234;
+
+	m_x = 0;
+	m_y = 0;
+	m_z = 0;
+}
+
+
+/// Sets ADC values corresponding to stable stationary zero g value. Note that it uses raw ADC values and not 
+/// voltage levels. 
+void Accelerometer::set_zerog_values(uint16_t x, uint16_t y, uint16_t z)
+{
+	m_zerog_x = x;
+	m_zerog_y = y;
+	m_zerog_z = z;
+}
+
+void Accelerometer::process_ADC_sample(uint16_t adc_x, uint16_t adc_y, uint16_t adc_z)
+{
+	int32_t xx, yy, zz; //stores intemediate vaules in mV centered around zero
+
+
+	xx = (int32_t)m_zerog_x - adc_x; //inverting x axis to match orientation format
+	yy = adc_y - (int32_t)m_zerog_y;
+	zz = adc_z - (int32_t)m_zerog_z;
 	
-	mX = 0;
-	mY = 0;
-	mZ = 0;
-}
+	//Convert from milli Volts to milli g units.
+	xx = (xx * m_mV2mg) >> 10;
+	yy = (yy * m_mV2mg) >> 10;
+	zz = (zz * m_mV2mg) >> 10;
 
-void Accelerometer::set_zero_values(uint16_t x, uint16_t y, uint16_t z)
-{
-	mX_zero = x;
-	mY_zero = y;
-	mZ_zero = z;
-}
+	//divide value by 1024, since the conversion factor was multiplied by 1024 to reduce round off errors.
+	m_x = (int16_t) xx; //to match the orientation such clockwise rotation is +ve
+	m_y = (int16_t) yy;
+	m_z = (int16_t) zz;
 
-void Accelerometer::process_ADC_sample(uint16_t a, uint16_t b, uint16_t c)
-{
-	mX = a - mX_zero;
-	mY = b - mY_zero;
-	mZ = c - mZ_zero;
 }  
 
+int16_t	Accelerometer::get_x()
+{
+	return m_x;
+}
+
+int16_t	Accelerometer::get_y()
+{
+	return m_y;
+}
+
+int16_t	Accelerometer::get_z()
+{
+	return m_z;
+}
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
-
 Accelerometer Acclmtr;

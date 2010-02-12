@@ -18,22 +18,33 @@
 
 class Accelerometer
 {
-	
-   public:
-	int16_t mX;
-	int16_t mY;
-	int16_t mZ;  		
-	
-	int16_t mX_zero;
-	int16_t mY_zero;
-	int16_t mZ_zero;
-	
+public:
+	//Needs to be static so that it can be initialized.
+
+	//The sensitivity of MMA7260QT in 1.5g is 800mV/g.
+	//Which when converted to mg/mV comes out to 1.25 mg/mV. If integer representation is used
+	//then it becomes 1mV/mg which gives a large round off error.
+	//To minimize round of error multiply the conversion factor by 1024 (power of 2) and divide the
+	//final result by 1024.
+	static const int16_t m_mV2mg = (uint16_t) ((1000.0/800.0)*1024); //conversion factor, from milli Volts to milli g
  
-  public:
+	int16_t m_x;
+	int16_t m_y;
+	int16_t m_z;
+
+	int16_t m_zerog_x;
+	int16_t m_zerog_y;
+	int16_t m_zerog_z;
+
   	Accelerometer();
   	
-  	void set_zero_values(uint16_t x, uint16_t y, uint16_t z);
-	void process_ADC_sample(uint16_t x, uint16_t y, uint16_t z);  
+  	void set_zerog_values(uint16_t x, uint16_t y, uint16_t z);
+	void process_ADC_sample(uint16_t x, uint16_t y, uint16_t z); 
+
+	///Returns measured g values in milli g units.
+	int16_t	get_x();
+	int16_t	get_y();
+	int16_t	get_z();
 
 };
 

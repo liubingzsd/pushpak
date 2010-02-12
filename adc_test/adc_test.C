@@ -74,10 +74,11 @@ void sensor_calibrate()
 	
 	for(i=0;i<AVG_CNT;++i) //collect data for 1sec or 100 times
 	{
-		adc_get_new_samples();
- 		acc_x_zeroG += gADC_output[0];
-	 	acc_y_zeroG += gADC_output[1];
-	 	acc_z_zeroG += gADC_output[2];
+		adc_update();
+ 		acc_x_zeroG += adc_get_value_mv(ACCL_X_CH);
+	 	acc_y_zeroG += adc_get_value_mv(ACCL_Y_CH);
+	 	acc_z_zeroG += adc_get_value_mv(ACCL_Z_CH);
+	 	
 	 	gyro_x_zero += gADC_output[3];
 	 	gyro_y_zero += gADC_output[4];
 	 	gyro_z_zero += gADC_output[5];		
@@ -91,8 +92,9 @@ void sensor_calibrate()
  	gyro_y_zero /= AVG_CNT;
  	gyro_z_zero /= AVG_CNT;
 	
+ 	 	
  	//Note for Z axis using the same value as X axis. When sensor board is flat, the Z is either +/- 1G.
-	Acclmtr.set_zero_values((uint16_t)acc_x_zeroG, (uint16_t)acc_y_zeroG, (uint16_t) acc_x_zeroG);	 	 	
+	Acclmtr.set_zerog_values((uint16_t)acc_x_zeroG, (uint16_t)acc_y_zeroG, (uint16_t) acc_x_zeroG);	 	 	
  			
 	Gyro.set_zero_values((uint16_t)gyro_x_zero, (uint16_t)gyro_y_zero, (uint16_t) gyro_z_zero);	 	 	
 }
@@ -113,7 +115,7 @@ void setup()
 	adc_initialize(); //Initialize adc at the last as this funtion enable interrupts.
 	
 	sensor_calibrate();
-	
+/*	
 	Serial.print("Raw ADC count for 1.1V ref = ");
 	Serial.println(adc_raw_ref_val);
 	Serial.print("Raw ADC millivolts per count = ");
@@ -125,13 +127,15 @@ void setup()
 	Serial.println((float) (1100.0/(float)adc_ref_val));
 		
 	Serial.print("Accelerometer calibration values, X, Y, Z: " );
-	Serial.print(Acclmtr.mX_zero);
+	Serial.print(Acclmtr.m_zerog_x);
 	Serial.print(", ");
-	Serial.print(Acclmtr.mY_zero);
+	Serial.print(Acclmtr.m_zerog_y);
 	Serial.print(", ");
-	Serial.print(Acclmtr.mZ_zero);
+	Serial.print(Acclmtr.m_zerog_z);
 	Serial.println();
-	
+
+*/
+/*	
 	Serial.print("Gyro calibration values, X, Y, Z: " );
 	Serial.print(Gyro.mX_zero);
 	Serial.print(", ");
@@ -139,7 +143,7 @@ void setup()
 	Serial.print(", ");
 	Serial.print(Gyro.mZ_zero);
 	Serial.println();
-
+*/
 	
 	Serial.println();
 	
@@ -149,6 +153,21 @@ void setup()
 	pkt.pkt_type = 0xB7;
 	pkt.length = 13;
 	pkt.active = 0x3F;
+	
+	int x, y;
+	
+	x = -1;
+	y = -1024;
+	
+	x = x >> 2;
+	y = y >> 2;
+	
+	Serial.print("x = ");
+	Serial.println(x);
+
+	Serial.print("y = ");
+	Serial.println(y);
+	
 	
 	//Interrupts are enabled in the 
 	//sei(); //enable interrupts
@@ -161,11 +180,19 @@ void loop()
 	uint16_t chk_sum = 0;
 	uint8_t *ptr;
 	
+	int16_t x,y,z;
+
+
 //	//use this for loop to reduce the data rate at which data is sent to pc.
- 	for(i=0;i<50;++i)
+ 	for(i=0;i<1;++i)
  	{
- 		adc_get_new_samples();
- 		Acclmtr.process_ADC_sample(gADC_output[0], gADC_output[1], gADC_output[2]);
+ 		adc_update();
+		
+		x = adc_get_value_mv(ACCL_X_CH);
+		y = adc_get_value_mv(ACCL_Y_CH);
+		z = adc_get_value_mv(ACCL_Z_CH);
+
+		Acclmtr.process_ADC_sample(x,y,z);
  		Gyro.process_ADC_sample(gADC_output[3], gADC_output[4], gADC_output[5]);
  	}
  
@@ -174,37 +201,60 @@ void loop()
  		
 ///////////////////////////////////////////////////////////////	
 // 	//Send ADC data in ASCII format.
-//  	Serial.print(adc_get_sample_cnt());
-//  	Serial.print(',');
-//  	for(i=0;i<NUM_ADC_CH;++i)
-//  	{
-//  		Serial.print((unsigned int) gADC_output[i]);
-//  		Serial.print(',');
-//  	}
-//  	Serial.println();
+  	Serial.print(adc_get_sample_time());
+  	
+  	for(i=0;i<6;++i)
+  	{
+		Serial.print(',');
+  		Serial.print((unsigned int) gADC_output[i]);
+   	}
+  	Serial.println();
 
 ///////////////////////////////////////////////////////////////	
 
 ///////////////////////////////////////////////////////////////	
 // 	//Send Sensor data in ASCII format.
- 	Serial.print(adc_get_sample_cnt());
- 	Serial.print(',');
- 	
-	Serial.print(Acclmtr.mX);
+// 	Serial.print(adc_get_sample_time());
+//	Serial.print(',');
+ 
+/*
+	Serial.print(gADC_output[0]);
 	Serial.print(',');
-	Serial.print(Acclmtr.mY);
+	Serial.print(gADC_output[1]);
 	Serial.print(',');
-	Serial.print(Acclmtr.mZ);
+	Serial.print(gADC_output[2]);
 	Serial.print(',');
+*/ 
 
-	Serial.print(Gyro.mX);
+/* 
+	Serial.print(adc_get_value_mv(ACCL_X_CH));
 	Serial.print(',');
-	Serial.print(Gyro.mY);
+	Serial.print(adc_get_value_mv(ACCL_Y_CH));
 	Serial.print(',');
-	Serial.print(Gyro.mZ);
+	Serial.print(adc_get_value_mv(ACCL_Z_CH));
 	Serial.print(',');
+*/
+
+//	x = Acclmtr.get_x();
+//	y = Acclmtr.get_y();
+//	z = Acclmtr.get_z();
+
+//	Serial.print((int)x);
+//	Serial.print(',');
+//	Serial.print(y);
+//	Serial.print(',');
+//	Serial.print((int)z);
+//	Serial.print(',');
+
+
+//	Serial.print(Gyro.mX);
+//	Serial.print(',');
+//	Serial.print(Gyro.mY);
+//	Serial.print(',');
+//	Serial.print(Gyro.mZ);
+//	Serial.print(',');
 		
- 	Serial.println();
+// 	Serial.println();
 
 ///////////////////////////////////////////////////////////////	
 

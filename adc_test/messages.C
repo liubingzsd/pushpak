@@ -55,7 +55,7 @@ void send_msg_ADC12b_samples(void)
 	struct msg_ADC12b_type msg = {0xAB, 0xCD, MSG_ADC12B_ID}; 
 	
 	msg.length = sizeof(msg_ADC12b_type) - 4;
-	msg.sys_time = adc_get_sample_cnt();
+	msg.sys_time = adc_get_sample_time();
 	
 	msg.adc_data[0] = gADC_output[0];
 	msg.adc_data[1] = gADC_output[1];
@@ -75,7 +75,7 @@ void send_msg_sensor_values(void)
 	struct msg_sensor_type msg = {0xAB, 0xCD, MSG_SENSOR_ID}; 
 	
 	msg.length = sizeof(msg_sensor_type) - 4;
-	msg.sys_time = adc_get_sample_cnt();
+	msg.sys_time = adc_get_sample_time();
 	
  	msg.acc_x = gADC_output[0];
 	msg.acc_y = gADC_output[1];
