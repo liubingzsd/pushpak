@@ -21,14 +21,32 @@ extern "C"{
 
 #define NUM_ADC_CH 				8	//! \def Number of ADC channels to sample
 
+#define ACCL_X_CH 	0
+#define ACCL_Y_CH 	1
+#define ACCL_Z_CH 	2
+#define GYRO_X_CH 	3
+#define GYRO_Y_CH 	4
+#define GYRO_Z_CH 	5
+#define MISC_CH 	6
+#define BATTERY_CH 	7
+
+
 extern volatile uint16_t gADC_output[NUM_ADC_CH];	//! \def Copy of the final accumlated output result which is accessed by user programs.
 extern volatile uint16_t gADC_curr[NUM_ADC_CH];		//! \def current ADC sample without any accumlation or averaging
-extern volatile uint16_t adc_ref_val, adc_raw_ref_val;		//! \def ADC sample value when 1.1V reference voltage is sampled.
+extern uint16_t adc_ref_val, adc_raw_ref_val;		//! \def ADC sample value when 1.1V reference voltage is sampled.
+
+
+
 
 void adc_initialize();
 uint8_t adc_is_data_ready();
-void adc_get_new_samples(void);
-uint32_t adc_get_sample_cnt();
+void adc_update(void);
+uint32_t adc_get_sample_time();
+
+int16_t adc_get_value_mv( uint8_t ch);
+int16_t adc_get_sample( uint8_t ch);
+
+
 
 #ifdef __cplusplus
 } // extern "C"
