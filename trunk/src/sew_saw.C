@@ -14,6 +14,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
+#include <util/delay.h>
 
 #include "pushpak.h"
 #include "util.h"
@@ -23,6 +24,7 @@
 #include "HardwareSerial.h"
 #include "Accelerometer.h"
 #include "GyroSensor.h"
+#include "servo_out.h"
 
 
 void sensor_calibrate()
@@ -75,6 +77,8 @@ void sensor_calibrate()
 }
 
 
+
+
 void setup() 
 {
 
@@ -90,6 +94,17 @@ void setup()
 	adc_initialize(); //Initialize adc at the last as this funtion enable interrupts.
 	
 	sensor_calibrate();
+	
+	initialize_servo_out();	
+	
+	update_servo_out(1,1);
+	update_servo_out(2,1);
+	update_servo_out(3,1);
+	update_servo_out(4,1);
+
+	GPIO_SET(LED);
+	_delay_ms(5000);
+	
 	
 	Serial.print("Raw ADC count for 1.1V ref = ");
 	Serial.println(adc_raw_ref_val);
@@ -124,6 +139,11 @@ void setup()
 
 }
 
+
+#define DEF_VAL 35
+#define P_TERM  12.0
+
+
 void loop() 
 {
 	int32_t x,y,z;
@@ -131,14 +151,16 @@ void loop()
 	int32_t temp;
 	static uint8_t cnt;
 
+	float correction;
+	
+	int16_t left_motor, right_motor;
+	int16_t left_corr, right_corr;
+
+
 	cnt++;
-
-
 	
  	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
 	adc_update(); //blocking call
-
-
 		
 	x = adc_get_value_mv(ACCL_X_CH);
 	y = adc_get_value_mv(ACCL_Y_CH);
@@ -150,7 +172,6 @@ void loop()
 	x = Acclmtr.get_x();
 	y = Acclmtr.get_y();
 	z = Acclmtr.get_z();
-
   		
 	temp = y*y + z*z;
 	temp = sqrt(temp);
@@ -163,11 +184,53 @@ void loop()
 	temp = x*x + y*y;
 	temp = sqrt(temp);
 	yaw =  atan2(z, temp);
+
 	
-	if(cnt%50 == 0)
+	correction = pitch * P_TERM;
+	
+	//put a threshold
+	correction = (correction > 8) ? 8 : correction;
+	correction = (correction < -8) ? -8 : correction;
+
+	left_motor = DEF_VAL - correction;
+	right_motor = DEF_VAL + correction;
+
+
+
+	//saftey limits
+	left_motor = (left_motor < 0) ? 0 : left_motor;
+	left_motor = (left_motor > 75) ? 75 : left_motor;
+
+	right_motor = (right_corr < 0) ? 0 : right_motor;
+	right_motor = (right_corr > 75) ? 75 : right_motor;
+
+
+
+
+
+	update_servo_out(1,right_motor);
+	update_servo_out(3,left_motor);
+
+
+	if(cnt%25 == 0)
 	{
 		Serial.print(adc_get_sample_time());
 		Serial.print(",");
+
+		Serial.print(pitch);
+		Serial.print(",");
+
+		Serial.print(correction);
+		Serial.print(",");
+
+		Serial.print(left_motor);
+		Serial.print(",");
+
+		Serial.println(right_motor);
+//		Serial.print(",");
+
+
+/*
 	
 		Serial.print(x);
 		Serial.print(",");
@@ -185,7 +248,10 @@ void loop()
 		Serial.print(",");
 
 		Serial.println(yaw);
+*/
 	}
+
+
 
 }
 
