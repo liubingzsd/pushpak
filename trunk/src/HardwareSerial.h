@@ -24,12 +24,15 @@
 
 #include "Print.h"
 
-struct ring_buffer;
+struct rx_ring_buffer;
+struct tx_ring_buffer;
+
 
 class HardwareSerial : public Print
 {
   private:
-    ring_buffer *_rx_buffer;
+    rx_ring_buffer *_rx_buffer;
+    tx_ring_buffer *_tx_buffer;
     volatile uint8_t *_ubrrh;
     volatile uint8_t *_ubrrl;
     volatile uint8_t *_ucsra;
@@ -38,28 +41,22 @@ class HardwareSerial : public Print
     uint8_t _rxen;
     uint8_t _txen;
     uint8_t _rxcie;
-    uint8_t _udre;
+    uint8_t _udrie;
     uint8_t _u2x;
   public:
-    HardwareSerial(ring_buffer *rx_buffer,
+    HardwareSerial(rx_ring_buffer *rx_buffer, tx_ring_buffer *tx_buffer,
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
       volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
       volatile uint8_t *udr,
-      uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x);
+      uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x);
     void begin(long);
     uint8_t available(void);
-    int read(void);
+    uint8_t read(void);
     void flush(void);
     virtual void write(uint8_t);
     using Print::write; // pull in write(str) and write(buf, size) from Print
 };
 
 extern HardwareSerial Serial;
-
-#if defined(__AVR_ATmega1280__)
-extern HardwareSerial Serial1;
-extern HardwareSerial Serial2;
-extern HardwareSerial Serial3;
-#endif
 
 #endif
