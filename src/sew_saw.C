@@ -68,7 +68,6 @@ void sensor_calibrate()
  	gyro_x_zero /= AVG_CNT;
  	gyro_y_zero /= AVG_CNT;
  	gyro_z_zero /= AVG_CNT;
-	
  	 	
  	//Note for Z axis using the same value as X axis. When sensor board is flat, the Z is either +/- 1G.
 	Acclmtr.set_zerog_values((uint16_t)acc_x_zeroG, (uint16_t)acc_y_zeroG, (uint16_t) acc_x_zeroG);	 	 	
@@ -93,7 +92,9 @@ void setup()
 
 	adc_initialize(); //Initialize adc at the last as this funtion enable interrupts.
 	
-	sensor_calibrate();
+//	sensor_calibrate();
+
+	Acclmtr.set_zerog_values((uint16_t)1658, (uint16_t)1658, (uint16_t)1658);	 	 	
 	
 	initialize_servo_out();	
 	
@@ -140,8 +141,17 @@ void setup()
 }
 
 
-#define DEF_VAL 35
-#define P_TERM  12.0
+#define FF_VAL 35 		//Feed foward value
+
+#define P_CONST  12.0
+#define D_CONST  0.0
+#define I_CONST  0.000
+
+
+#define MAX_P	8
+#define MAX_I	0.8
+#define MAX_D	20
+
 
 
 void loop() 
@@ -150,14 +160,17 @@ void loop()
 	double pitch, roll, yaw;
 	int32_t temp;
 	static uint8_t cnt;
-
-	float correction;
+	static uint8_t overflow = 0;
+	
+	
+	float err;
+	static float err_d1 = 0, err_d2 = 0; // _d1 = delayed by 1 or previous cycles sample.
+	static float p_term, i_term, d_term;
+	float corr; //correction
+	static float corr_d1 = 0; 
+	
 	
 	int16_t left_motor, right_motor;
-	int16_t left_corr, right_corr;
-
-
-	cnt++;
 	
  	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
 	adc_update(); //blocking call
@@ -185,42 +198,60 @@ void loop()
 	temp = sqrt(temp);
 	yaw =  atan2(z, temp);
 
+	err = pitch; 
+
+	p_term = P_CONST * err;
+	p_term = (p_term > MAX_P) ? MAX_P : p_term;
+	p_term = (p_term < -MAX_P) ? -MAX_P : p_term;
+
+
+	i_term += (I_CONST * err);
+	i_term = (i_term > MAX_I) ? MAX_I : i_term;
+	i_term = (i_term < -MAX_I) ? -MAX_I : i_term;
+
 	
-	correction = pitch * P_TERM;
+	corr = p_term + i_term;
 	
 	//put a threshold
-	correction = (correction > 8) ? 8 : correction;
-	correction = (correction < -8) ? -8 : correction;
-
-	left_motor = DEF_VAL - correction;
-	right_motor = DEF_VAL + correction;
-
-
+	corr = (corr > 100) ? 100 : corr;
+	corr = (corr < -100) ? -100 : corr;
+	
+	left_motor = FF_VAL - (int16_t) corr;
+	right_motor = FF_VAL + (int16_t) corr;
 
 	//saftey limits
 	left_motor = (left_motor < 0) ? 0 : left_motor;
-	left_motor = (left_motor > 75) ? 75 : left_motor;
+	left_motor = (left_motor > 100) ? 100 : left_motor;
 
-	right_motor = (right_corr < 0) ? 0 : right_motor;
-	right_motor = (right_corr > 75) ? 75 : right_motor;
+	right_motor = (right_motor < 0) ? 0 : right_motor;
+	right_motor = (right_motor > 100) ? 100 : right_motor;
 
+//	update_servo_out(1,right_motor);
+//	update_servo_out(3,left_motor);
 
+	err_d1 = err;
+	err_d2 = err_d1;
+	corr_d1 = corr;
 
-
-
-	update_servo_out(1,right_motor);
-	update_servo_out(3,left_motor);
-
-
-	if(cnt%25 == 0)
+	cnt++;
+	if(cnt%10 == 0)
 	{
-		Serial.print(adc_get_sample_time());
+		Serial.print(int16_t(overflow));
 		Serial.print(",");
 
-		Serial.print(pitch);
+		Serial.print(int16_t(pitch * 100));
 		Serial.print(",");
 
-		Serial.print(correction);
+		Serial.print(p_term);
+		Serial.print(",");
+
+		Serial.print(i_term);
+		Serial.print(",");
+
+		Serial.print(d_term);
+		Serial.print(",");
+
+		Serial.print(corr);
 		Serial.print(",");
 
 		Serial.print(left_motor);
@@ -228,31 +259,10 @@ void loop()
 
 		Serial.println(right_motor);
 //		Serial.print(",");
-
-
-/*
-	
-		Serial.print(x);
-		Serial.print(",");
-
-		Serial.print(y);
-		Serial.print(",");
-
-		Serial.print(z);
-		Serial.print(",");
-	
-		Serial.print(pitch);
-		Serial.print(",");
-	
-		Serial.print(roll);
-		Serial.print(",");
-
-		Serial.println(yaw);
-*/
 	}
 
-
-
+	overflow = adc_is_data_ready();
+	
 }
 
 

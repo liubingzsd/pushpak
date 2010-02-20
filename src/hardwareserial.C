@@ -17,6 +17,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   
   Modified 23 November 2006 by David A. Mellis
+  
+  Modified February 18, 2010 by Brijesh
+  Modified code so that data transmission is not interrupt based and uses buffers.
+  
 */
 
 #include <stdio.h>
@@ -24,33 +28,66 @@
 #include <inttypes.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
+#include <util/atomic.h>
 
 #include "pushpak.h"
 #include "HardwareSerial.h"
+	
 
 // Define constants and variables for buffering incoming serial data.  We're
 // using a ring buffer (I think), in which rx_buffer_head is the index of the
 // location to which to write the next incoming character and rx_buffer_tail
 // is the index of the location from which to read.
-#define RX_BUFFER_SIZE 128
 
-struct ring_buffer {
-  unsigned char buffer[RX_BUFFER_SIZE];
-  int head;
-  int tail;
-};
+//WARNING: Buffer sizes MUST be power of 2.
+#define RX_BUFFER_SIZE 64
+#define TX_BUFFER_SIZE 64
 
-ring_buffer rx_buffer = { { 0 }, 0, 0 };
+#define RX_BUFFER_MASK (RX_BUFFER_SIZE - 1)
+#define TX_BUFFER_MASK (TX_BUFFER_SIZE - 1)
 
-#if defined(__AVR_ATmega1280__)
-ring_buffer rx_buffer1 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer2 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer3 = { { 0 }, 0, 0 };
+#if (RX_BUFFER_SIZE & RX_BUFFER_MASK)
+#    error RX buffer size is not a power of 2
+#endif
+#if (TX_BUFFER_SIZE & TX_BUFFER_MASK)
+#    error TX buffer size is not a power of 2
 #endif
 
-inline void store_char(unsigned char c, ring_buffer *rx_buffer)
+#if (RX_BUFFER_SIZE > 256 )		//head and tail counters data types limits the buffer size
+#    error RX buffer size is too large.
+#endif
+#if (TX_BUFFER_SIZE > 256 )
+#    error TX buffer size is too large.
+#endif
+
+/////////////////////////////////////////////////////
+//RX buffers
+
+struct rx_ring_buffer {
+  uint8_t buffer[RX_BUFFER_SIZE];
+  volatile uint8_t head;
+  volatile uint8_t tail;
+};
+
+rx_ring_buffer rx_buffer0 = { { 0 }, 0, 0 };
+
+////////////////////////////////////////////////////
+//Tx Buffers
+
+struct tx_ring_buffer {
+  uint8_t buffer[TX_BUFFER_SIZE];
+  volatile uint8_t head;
+  volatile uint8_t tail;
+};
+
+tx_ring_buffer tx_buffer0 = { { 0 }, 0, 0 };
+
+
+/////////////////////////////////////////////////////////////////////////
+
+inline void store_char(unsigned char c, rx_ring_buffer *rx_buffer)
 {
-  int i = (rx_buffer->head + 1) % RX_BUFFER_SIZE;
+  uint8_t i = (rx_buffer->head + (uint8_t) 1) & (uint8_t)RX_BUFFER_MASK;
 
   // if we should be storing the received character into the location
   // just before the tail (meaning that the head would advance to the
@@ -62,73 +99,80 @@ inline void store_char(unsigned char c, ring_buffer *rx_buffer)
   }
 }
 
-#if defined(__AVR_ATmega1280__)
+#if defined (__AVR_ATmega644P__)
 
-SIGNAL(SIG_USART0_RECV)
-{
-  unsigned char c = UDR0;
-  store_char(c, &rx_buffer);
-}
-
-SIGNAL(SIG_USART1_RECV)
-{
-  unsigned char c = UDR1;
-  store_char(c, &rx_buffer1);
-}
-
-SIGNAL(SIG_USART2_RECV)
-{
-  unsigned char c = UDR2;
-  store_char(c, &rx_buffer2);
-}
-
-SIGNAL(SIG_USART3_RECV)
-{
-  unsigned char c = UDR3;
-  store_char(c, &rx_buffer3);
-}
-
-//#elif defined(__AVR_ATmega644p__)
-#elif defined(__AVR_ATmega644p__)
-
-SIGNAL(SIG_USART0_RECV)
-{
-  unsigned char c = UDR0;
-  store_char(c, &rx_buffer);
-}
-
-SIGNAL(SIG_USART1_RECV)
-{
-  unsigned char c = UDR1;
-  store_char(c, &rx_buffer1);
-}
-//#else
-//	#if defined(__AVR_ATmega8__)
-//		SIGNAL(SIG_UART_RECV)
-//	#else
-//		SIGNAL(USART_RX_vect)
-//	#endif
-//	{
-//		#if defined(__AVR_ATmega8__)
-//		  unsigned char c = UDR;
-//		#else
-//		  unsigned char c = UDR0;
-//		#endif
-//		  store_char(c, &rx_buffer);
-//	}
+	SIGNAL(SIG_USART_RECV)
+	{
+	  unsigned char c = UDR0;
+	  store_char(c, &rx_buffer0);
+	}
+	
+	
+	//SIGNAL(SIG_USART1_RECV)
+	//{
+	//  unsigned char c = UDR1;
+	//  store_char(c, &rx_buffer1);
+	//}
 
 #endif
 
 
+///////////////////////////////////////////////////////////////////////
+//Transmission ISR's
+
+// inline void send_char(volatile uint8_t *ucsrb, uint8_t udrie, volatile uint8_t *udr, tx_ring_buffer *tx_buffer)
+// {
+// 	if (tx_buffer->head == tx_buffer->tail)
+// 	{
+// 	// Buffer is empty, disable the interrupt
+// 	*ucsrb &= ~(1 << udrie);
+// 	}
+// 	else
+// 	{
+// 	tx_buffer->tail = (tx_buffer->tail + (uint8_t)1) & (uint8_t)TX_BUFFER_MASK;
+// 	*udr = tx_buffer->buffer[tx_buffer->tail];
+// 	}  
+// }
+
+SIGNAL(SIG_USART_DATA)
+{
+  if (tx_buffer0.head == tx_buffer0.tail)
+  {
+    // Buffer is empty, disable the interrupt
+    UCSR0B &= ~(1 << UDRIE0);
+  }
+  else
+  {
+    tx_buffer0.tail = (tx_buffer0.tail + (uint8_t)1) & (uint8_t)TX_BUFFER_MASK;
+    UDR0 = tx_buffer0.buffer[tx_buffer0.tail];
+  }  
+}
+
+// SIGNAL(SIG_USART1_DATA)
+// {
+//   if (tx_buffer1.head == tx_buffer1.tail)
+//   {
+//     // Buffer is empty, disable the interrupt
+//     UCSRB1 &= ~(1 << UDRIE1);
+//   }
+//   else
+//   {
+//     tx_buffer1.tail = (tx_buffer1.tail + (uint8_t)1) & (uint8_t)TX_BUFFER_MASK;
+//     UDR0 = tx_buffer1.buffer[tx_buffer1.tail];
+//   }  
+// }
+
+
 // Constructors ////////////////////////////////////////////////////////////////
 
-HardwareSerial::HardwareSerial(ring_buffer *rx_buffer,
+HardwareSerial::HardwareSerial(rx_ring_buffer *rx_buffer, tx_ring_buffer *tx_buffer, 
   volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
   volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
   volatile uint8_t *udr,
-  uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x)
+  uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x)
 {
   _rx_buffer = rx_buffer;
+  _tx_buffer = tx_buffer;
   _ubrrh = ubrrh;
   _ubrrl = ubrrl;
   _ucsra = ucsra;
@@ -137,7 +181,7 @@ HardwareSerial::HardwareSerial(ring_buffer *rx_buffer,
   _rxen = rxen;
   _txen = txen;
   _rxcie = rxcie;
-  _udre = udre;
+  _udrie = udrie;
   _u2x = u2x;
 }
 
@@ -175,6 +219,10 @@ void HardwareSerial::begin(long baud)
   *_ubrrh = baud_setting >> 8;
   *_ubrrl = baud_setting;
 
+  // Flush buffers
+  _tx_buffer->head = _tx_buffer->tail = 0;
+  _rx_buffer->head = _rx_buffer->tail = 0;
+  
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
@@ -182,18 +230,21 @@ void HardwareSerial::begin(long baud)
 
 uint8_t HardwareSerial::available(void)
 {
-  return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
+  return (_rx_buffer->head - _rx_buffer->tail) & (uint8_t)RX_BUFFER_MASK;
 }
 
-int HardwareSerial::read(void)
+uint8_t HardwareSerial::read(void)
 {
   // if the head isn't ahead of the tail, we don't have any characters
-  if (_rx_buffer->head == _rx_buffer->tail) {
+  if (_rx_buffer->head == _rx_buffer->tail)
+  {
     return -1;
-  } else {
-    unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
-    _rx_buffer->tail = (_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
-    return c;
+  } 
+  else
+  {
+	  
+	_rx_buffer->tail = (_rx_buffer->tail + (uint8_t) 1) % RX_BUFFER_MASK;  
+	return _rx_buffer->buffer[_rx_buffer->tail];
   }
 }
 
@@ -208,27 +259,47 @@ void HardwareSerial::flush()
   // the value to rx_buffer_tail; the previous value of rx_buffer_head
   // may be written to rx_buffer_tail, making it appear as if the buffer
   // were full, not empty.
-  _rx_buffer->head = _rx_buffer->tail;
+    
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+	  _rx_buffer->head = _rx_buffer->tail;
+	}
 }
 
-void HardwareSerial::write(uint8_t c)
+
+// void HardwareSerial::write(uint8_t c)
+// {
+//   while (!((*_ucsra) & (1 << _udre)))
+//     ;
+// 
+//   *_udr = c;
+// }
+
+void HardwareSerial::write(uint8_t data)
 {
-  while (!((*_ucsra) & (1 << _udre)))
-    ;
+	
+  uint8_t tmp_head;
+ 
+  // Calculate new head position
+   tmp_head = (_tx_buffer->head + (uint8_t)1) & (uint8_t)TX_BUFFER_MASK;
 
-  *_udr = c;
+  // Block until there's room in the buffer
+  // XXX: this may block forever if someone externally disabled the transmitter
+  //      or the DRE interrupt and there's data in the buffer. Careful!
+ 
+  while (tmp_head == _tx_buffer->tail);
+
+  //Store the data and then advance the head
+ 
+  _tx_buffer->buffer[tmp_head] = data;
+  _tx_buffer->head = tmp_head;
+
+  *_ucsrb |= (1 << _udrie); // Enable Data Register Empty interrupt
 }
+
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-#if defined(__AVR_ATmega8__)
-HardwareSerial Serial(&rx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
-#else
-HardwareSerial Serial(&rx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
-#endif
+HardwareSerial Serial(&rx_buffer0, &tx_buffer0, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRIE0, U2X0);
 
-#if defined(__AVR_ATmega1280__)
-HardwareSerial Serial1(&rx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
-HardwareSerial Serial2(&rx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
-HardwareSerial Serial3(&rx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
-#endif
+
