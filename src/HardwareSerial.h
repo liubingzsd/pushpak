@@ -50,9 +50,11 @@ class HardwareSerial : public Print
       volatile uint8_t *udr,
       uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x);
     void begin(long);
-    uint8_t available(void);
+    uint8_t data_available(void);
     uint8_t read(void);
     void flush(void);
+    
+    uint8_t space_available(void);
     virtual void write(uint8_t);
     using Print::write; // pull in write(str) and write(buf, size) from Print
 };

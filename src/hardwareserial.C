@@ -228,24 +228,25 @@ void HardwareSerial::begin(long baud)
   sbi(*_ucsrb, _rxcie);
 }
 
-uint8_t HardwareSerial::available(void)
+uint8_t HardwareSerial::data_available(void)
 {
   return (_rx_buffer->head - _rx_buffer->tail) & (uint8_t)RX_BUFFER_MASK;
 }
 
 uint8_t HardwareSerial::read(void)
 {
-  // if the head isn't ahead of the tail, we don't have any characters
-  if (_rx_buffer->head == _rx_buffer->tail)
-  {
-    return -1;
-  } 
-  else
-  {
-	  
-	_rx_buffer->tail = (_rx_buffer->tail + (uint8_t) 1) % RX_BUFFER_MASK;  
-	return _rx_buffer->buffer[_rx_buffer->tail];
-  }
+	uint8_t temp;	
+	// if the head isn't ahead of the tail, we don't have any characters
+	if (_rx_buffer->head == _rx_buffer->tail)
+	{
+		return 0;
+	} 
+	else
+	{
+		temp = _rx_buffer->buffer[_rx_buffer->tail];	
+		_rx_buffer->tail = (_rx_buffer->tail + (uint8_t) 1) % RX_BUFFER_MASK;  
+		return temp;
+	}
 }
 
 void HardwareSerial::flush()
@@ -266,14 +267,17 @@ void HardwareSerial::flush()
 	}
 }
 
-
-// void HardwareSerial::write(uint8_t c)
-// {
-//   while (!((*_ucsra) & (1 << _udre)))
-//     ;
-// 
-//   *_udr = c;
-// }
+//! Returns the empty space available in transmit buffers.
+uint8_t HardwareSerial::space_available(void)
+{
+	uint8_t temp;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		temp = (_tx_buffer->head - _tx_buffer->tail) & (uint8_t)TX_BUFFER_MASK;
+		temp = TX_BUFFER_MASK - temp;
+	}
+	return temp;
+}
 
 void HardwareSerial::write(uint8_t data)
 {
