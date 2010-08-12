@@ -25,6 +25,8 @@
 #include "Accelerometer.h"
 #include "GyroSensor.h"
 #include "servo_out.h"
+#include "messages.h"
+#include "packet.h"
 
 
 void sensor_calibrate()
@@ -80,6 +82,7 @@ void sensor_calibrate()
 
 void setup() 
 {
+	sei(); //enable interrupts
 
 	Serial.begin(115200); 
 	Serial.println();
@@ -91,11 +94,12 @@ void setup()
 	GPIO_OUTPUT(GYRO_AUTO_ZERO);
 
 	adc_initialize(); //Initialize adc at the last as this funtion enable interrupts.
-	
-//	sensor_calibrate();
 
+//Hardcoding the Zero g Values		
+//	sensor_calibrate();
 	Acclmtr.set_zerog_values((uint16_t)1658, (uint16_t)1658, (uint16_t)1658);	 	 	
 	
+	//Need to initialize the servo outputs to properly setup the ESC's
 	initialize_servo_out();	
 	
 	update_servo_out(1,1);
@@ -104,8 +108,7 @@ void setup()
 	update_servo_out(4,1);
 
 	GPIO_SET(LED);
-	_delay_ms(5000);
-	
+	_delay_ms(1000); //Needed for ESC setup.
 	
 	Serial.print("Raw ADC count for 1.1V ref = ");
 	Serial.println(adc_raw_ref_val);
@@ -134,10 +137,6 @@ void setup()
 	Serial.println();
 */
 	Serial.println();
-	
-	//Interrupts are enabled in the 
-	sei(); //enable interrupts
-
 }
 
 
@@ -162,18 +161,16 @@ void loop()
 	static uint8_t cnt;
 	static uint8_t overflow = 0;
 	
-	
 	float err;
 	static float err_d1 = 0, err_d2 = 0; // _d1 = delayed by 1 or previous cycles sample.
 	static float p_term, i_term, d_term;
 	float corr; //correction
 	static float corr_d1 = 0; 
 	
-	
 	int16_t left_motor, right_motor;
 	
- 	GPIO_TOGGLE(LED); //LED is on Port D, Pin 4
-	adc_update(); //blocking call
+ 	GPIO_TOGGLE(LED); 	//LED is on Port D, Pin 4
+	adc_update(); 		//blocking call
 		
 	x = adc_get_value_mv(ACCL_X_CH);
 	y = adc_get_value_mv(ACCL_Y_CH);
@@ -188,7 +185,7 @@ void loop()
   		
 	temp = y*y + z*z;
 	temp = sqrt(temp);
-	pitch =  atan2(x, temp);
+	pitch =  atan2(x,temp);
 	
 	temp = x*x + z*z;
 	temp = sqrt(temp);
@@ -226,43 +223,28 @@ void loop()
 	right_motor = (right_motor < 0) ? 0 : right_motor;
 	right_motor = (right_motor > 100) ? 100 : right_motor;
 
-//	update_servo_out(1,right_motor);
-//	update_servo_out(3,left_motor);
-
+	if(gRun_flag == 1)
+	{	
+		update_servo_out(1,right_motor);
+		update_servo_out(3,left_motor);
+	}
+	
 	err_d1 = err;
 	err_d2 = err_d1;
 	corr_d1 = corr;
-
-	cnt++;
-	if(cnt%10 == 0)
-	{
-		Serial.print(int16_t(overflow));
-		Serial.print(",");
-
-		Serial.print(int16_t(pitch * 100));
-		Serial.print(",");
-
-		Serial.print(p_term);
-		Serial.print(",");
-
-		Serial.print(i_term);
-		Serial.print(",");
-
-		Serial.print(d_term);
-		Serial.print(",");
-
-		Serial.print(corr);
-		Serial.print(",");
-
-		Serial.print(left_motor);
-		Serial.print(",");
-
-		Serial.println(right_motor);
-//		Serial.print(",");
-	}
-
+	
 	overflow = adc_is_data_ready();
 	
+	uint8_t *ptr;
+	do{
+		ptr = parse_for_pkt();	//Parse the incomming messages in whatever time is remaning
+		
+		if(ptr != NULL)
+		{
+			process_msg(ptr);
+		}
+		
+	}while(!adc_is_data_ready());
 }
 
 

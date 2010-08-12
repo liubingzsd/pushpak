@@ -44,11 +44,11 @@ void Accelerometer::process_ADC_sample(uint16_t adc_x, uint16_t adc_y, uint16_t 
 	zz = adc_z - (int32_t)m_zerog_z;
 	
 	//Convert from milli Volts to milli g units.
+	//divide value by 1024, since the conversion factor was multiplied by 1024 to reduce round off errors.
 	xx = (xx * m_mV2mg) >> 10;
 	yy = (yy * m_mV2mg) >> 10;
 	zz = (zz * m_mV2mg) >> 10;
 
-	//divide value by 1024, since the conversion factor was multiplied by 1024 to reduce round off errors.
 	m_x = (int16_t) xx; //to match the orientation such clockwise rotation is +ve
 	m_y = (int16_t) yy;
 	m_z = (int16_t) zz;
