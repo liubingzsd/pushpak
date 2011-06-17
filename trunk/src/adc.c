@@ -23,15 +23,16 @@
 
 /// The ADC clock prescale is set to 128, which provides 156.250KHz ADC clock.
 /// ADC requires 13 clock cycles to sample data. So sampling rate is 156.250/13 = 12.0192KHz.
-/// This library samples all the 8 channels in continous loop using interrupts and autotrigger
-/// functionality. Individual channel sample rate = 12.0192/8 = 1.5024KHz. After accumalating 16 samples the final 
+/// This library samples all the 8 channels in continous loop using interrupts and autotrigger functionality.
+/// Individual channel sample rate = 12.0192/8 = 1.5024KHz. After accumalating 16 samples the final 
 /// sample rate is 1.5024/16 = 93.9 Hz. 
 ///
-/// With 16x oversampling and accumlation we have increased bit resoultion as defined by equation
-/// samples to be accumlated = 2^(4n) where n is number of additional bit resoultion.
+/// With 16x oversampling and accumlation we have increased bit resoultion by 2 its. 
+/// Equation that gives how many samples to accumalate for n bit increase in resolution is:
+/// Samples to be accumlated = 2^(4n) where n is number of additional bit resoultion.
 ///
 /// Accumlation of 16 samples results in bit growth out of 4 bits out of which only 2 bits are useful.
-///	So in the final output LSB 2 bits are dropped.
+///  In the final output LSB 2 bits are dropped.
 ///
 
 
@@ -52,8 +53,14 @@ volatile uint16_t gADC_output[NUM_ADC_CH];			//Contains latest accumalted and up
 volatile uint32_t gSample_cnt;
 
 uint16_t adc_ref_val, adc_raw_ref_val;
+
+// ADC sample value needs to be converted into Volts or millivolts. The operation invovles floating point values. Using floating point operation 
+// in to convert every sample is expensive. We can convert the conversation factor to interger value, but we lose precision by doing a direct float to integer coversion.
+// To solve this issue multiply the floating point conversion factor by a factor and then convert to integer value. Use this integer value to make the conversion and
+// then divide the finaly result by the same factor to get real value in volts or millivolts.
+
 uint16_t adc_conv_factor;
-#define FACTOR_MULTIPLE 10			//number of bits the ADC conversion factor is left shifted.
+#define FACTOR_MULTIPLE 10			//Used to increase the precision of converting from ADC sample to millivolts.
 
 
 
@@ -63,8 +70,8 @@ static volatile uint16_t gADC_acc[NUM_ADC_CH]; 		//Contains the intermediate acc
 static volatile uint16_t gADC_sample[NUM_ADC_CH];	//Contains the final accumlated output result
 
 volatile uint8_t gADC_new_output = 0;	//Flag to indicate when accumlation is finished and new output is available. This flag can used
-										//to synchronise the control loop to excat same rate as ADC sampling rate. The ADC sampling rate is
-										//100.16Hz.
+										//to synchronise the control loop to the exact same rate as ADC sampling rate. The ADC sampling rate is 100.16Hz.
+                              
 //***************************************************
 //Temporary variables for testing and characterization of the board. Delete for normal operation
 volatile uint16_t gADC_curr[NUM_ADC_CH];		//current ADC sample without any accumlation or averaging
@@ -151,12 +158,12 @@ void adc_initialize( )
 	//Drop the addition bits
 	adc_ref_val = adc_ref_val >> LSB_DROP_CNT; 
 	
-	//Calculate milli Volts per count.
-	//To get better resolution multiply the conversion by 1024 or 10bits.
+	//Calculate conversion factor( milliVolts per count).
+	//To get better resolution, multiply the conversion factor by 1024 or 10bits.
 	//Perform floating point operations and then convert to integer value
 	
 	factor = (1100.0* (1 << FACTOR_MULTIPLE))/adc_ref_val; 	//The refrence voltage inside AVR is 1.1V which 1100 in mV
-	factor = factor + 0.5; 					//To round the value to nearest integer
+  factor = factor + 0.5; 					//To round the value to nearest integer.
 	adc_conv_factor = (uint16_t) factor;
 	
 /**********************************************************************************************/
@@ -241,7 +248,7 @@ int16_t adc_get_value_mv( uint8_t ch)
 	//So multiply by conversion factor and then perform division by left shift to get true value in mV.
 
 	temp1 = gADC_output[ch];
-	temp2 = (temp1 * 743);
+  temp2 = (temp1 * adc_conv_factor); 
 	temp2 = temp2 >> FACTOR_MULTIPLE;
 
 	return (int16_t) temp2;
